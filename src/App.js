@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import LandingPage from './LandingPage';
 import './App.css';
 import { FiMapPin, FiCalendar, FiDollarSign } from 'react-icons/fi';
+import { searchFlights } from './services/flightService';
 
 function App() {
   const [showApp, setShowApp] = useState(false);
@@ -9,6 +10,12 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [date, setDate] = useState('');
+  const [aggregatorResult, setAggregatorResult] = useState(null);
+  const [loadingAggregator, setLoadingAggregator] = useState(false);
 
   const handleSearch = async () => {
     if (!userInput.trim()) {
@@ -48,6 +55,18 @@ function App() {
     }
   };
 
+  const handleAggregatorSearch = async () => {
+    if (!from || !to || !date) {
+      alert('Please provide From, To, and Date.');
+      return;
+    }
+
+    setLoadingAggregator(true);
+    const data = await searchFlights(from, to, date);
+    setAggregatorResult(data);
+    setLoadingAggregator(false);
+  };
+
   if (!showApp) {
     return <LandingPage onGetStarted={() => setShowApp(true)} />;
   }
@@ -57,6 +76,7 @@ function App() {
       <h1>TravelEase.ai</h1>
       <h2>Simplify Your Flight Search</h2>
 
+      {/* GPT-based Free-text search */}
       <input
         type="text"
         placeholder="e.g., Find me a flight from Delhi to Dubai next month"
@@ -64,7 +84,7 @@ function App() {
         onChange={(e) => setUserInput(e.target.value)}
       />
       <button onClick={handleSearch} disabled={loading}>
-        {loading ? 'Searching...' : 'Search'}
+        {loading ? 'Searching...' : 'Search with AI'}
       </button>
 
       {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
@@ -84,6 +104,27 @@ function App() {
           <p><FiDollarSign /> <strong>Max Budget:</strong> ₹{result.maxBudget || "N/A"}</p>
           <p><FiDollarSign /> <strong>Predicted Price Range:</strong> ₹{result.predictedPriceMin} - ₹{result.predictedPriceMax}</p>
         </div>
+      )}
+
+      <h2 style={{ marginTop: '2rem' }}>Or Search By Routes</h2>
+      <div className="input-group">
+        <input type="text" placeholder="From (e.g. DEL)" value={from} onChange={(e) => setFrom(e.target.value)} />
+        <input type="text" placeholder="To (e.g. DXB)" value={to} onChange={(e) => setTo(e.target.value)} />
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <button onClick={handleAggregatorSearch} disabled={loadingAggregator}>
+          {loadingAggregator ? 'Searching...' : 'Search Flights'}
+        </button>
+      </div>
+
+      {aggregatorResult && aggregatorResult.data && Object.keys(aggregatorResult.data).length > 0 && (
+        <div className="result-card">
+          <h3>Aggregator Results</h3>
+          <pre>{JSON.stringify(aggregatorResult.data, null, 2)}</pre>
+        </div>
+      )}
+
+      {aggregatorResult && aggregatorResult.data && Object.keys(aggregatorResult.data).length === 0 && (
+        <p>No flights found for the selected route and date.</p>
       )}
     </div>
   );
