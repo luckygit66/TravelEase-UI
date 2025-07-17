@@ -3,6 +3,9 @@ import LandingPage from './LandingPage';
 import './App.css';
 import { FiMapPin, FiCalendar, FiDollarSign } from 'react-icons/fi';
 import { searchFlights } from './services/flightService';
+import FlightResultCard from './components/FlightResultCard.jsx';
+import logo from './assets/travelspal-logo.png'; // ✅ Import the logo
+
 
 function App() {
   const [showApp, setShowApp] = useState(false);
@@ -73,8 +76,8 @@ function App() {
 
   return (
     <div className="container">
-      <h1>TravelEase.ai</h1>
-      <h2>Simplify Your Flight Search</h2>
+      <img src={logo} alt="TravelsPal Logo" style={{ width: '180px', marginBottom: '1rem' }} />
+      <h2>The only travel platform that tells you where to go, when to book, and how to save the most.</h2>
 
       {/* GPT-based Free-text search */}
       <input
@@ -117,10 +120,14 @@ function App() {
       </div>
 
       {aggregatorResult && aggregatorResult.data && Object.keys(aggregatorResult.data).length > 0 && (
-        <div className="result-card">
+        <>
           <h3>Aggregator Results</h3>
-          <pre>{JSON.stringify(aggregatorResult.data, null, 2)}</pre>
-        </div>
+          {Object.keys(aggregatorResult.data).map((dest) =>
+            Object.keys(aggregatorResult.data[dest]).map((key) => (
+              <FlightResultCard key={`${dest}-${key}`} flight={aggregatorResult.data[dest][key]} />
+            ))
+          )}
+        </>
       )}
 
       {aggregatorResult && aggregatorResult.data && Object.keys(aggregatorResult.data).length === 0 && (
