@@ -1,0 +1,130 @@
+.auth-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #dce8ff 0%, #eaf1ff 50%, #f5f8ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 48px rgba(26, 108, 240, 0.14);
+  border: 1px solid #dce8ff;
+}
+
+.auth-logo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1a6cf0;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+}
+
+.auth-card h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 0.25rem;
+}
+
+.auth-sub {
+  color: #888;
+  font-size: 0.95rem;
+  margin-bottom: 1.75rem;
+}
+
+.auth-field {
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+.auth-field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 0.4rem;
+}
+
+.auth-field label span {
+  font-weight: 400;
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.auth-field input {
+  width: 100%;
+  padding: 0.78rem 1rem;
+  border: 1.5px solid #e4e8f0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #1a1a2e;
+  background: #f8f9fa;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin: 0;
+  transform: none !important;
+  box-shadow: none;
+}
+
+.auth-field input:focus {
+  border-color: #1a6cf0;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(26, 108, 240, 0.1) !important;
+  outline: none;
+  transform: none !important;
+}
+
+.auth-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.auth-error {
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  color: #c53030;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+
+.auth-btn {
+  width: 100%;
+  background: #1a6cf0;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.85rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+  transform: none !important;
+}
+.auth-btn:hover { background: #1558c8; transform: none !important; }
+.auth-btn:disabled { background: #93bbf8; cursor: not-allowed; }
+
+.auth-switch {
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.auth-switch span {
+  color: #1a6cf0;
+  font-weight: 600;
+  cursor: pointer;
+}
+.auth-switch span:hover { text-decoration: underline; }
