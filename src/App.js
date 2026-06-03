@@ -5,7 +5,7 @@ import LandingPage from './LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import './App.css';
-import { FiSearch, FiLogOut, FiClock, FiWifi, FiArrowRight } from 'react-icons/fi';
+import { FiSearch, FiLogOut, FiClock, FiArrowRight } from 'react-icons/fi';
 import { searchFlights } from './services/flightService';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
@@ -78,9 +78,8 @@ function MainApp({ onGoHome, initialQuery = '' }) {
   const [usedMock, setUsedMock] = useState(false);
 
   // Auto-search if query came from landing page
-  useEffect(() => {
-    if (initialQuery.trim()) handleSearch(initialQuery);
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (initialQuery.trim()) handleSearch(initialQuery); }, []);
 
   const handleSearch = async (overrideQuery) => {
     const q = (typeof overrideQuery === 'string' ? overrideQuery : query).trim();
