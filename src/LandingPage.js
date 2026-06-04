@@ -96,7 +96,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
       </section>
 
       <section className="lp-section lp-features">
-        <h2>Why TravelEase?</h2>
+        <h2>Why TravelsPal?</h2>
         <div className="features-grid">
           <div className="feature-card">
             <div className="feature-icon"><FiSearch size={26} /></div>
@@ -117,7 +117,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
       </section>
 
       <footer className="lp-footer">
-        <p>© 2025 TravelEase — Smarter travel starts here</p>
+        <p>© 2025 TravelsPal — Smarter travel starts here</p>
       </footer>
 
     </div>

@@ -239,7 +239,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
         )}
       </div>
 
-      <footer className="app-footer">© 2025 TravelEase — Smarter travel starts here</footer>
+      <footer className="app-footer">© 2025 TravelsPal — Smarter travel starts here</footer>
     </div>
   );
 }

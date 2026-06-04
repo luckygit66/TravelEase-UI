@@ -37,7 +37,7 @@ function Logo({ iconSize = 38 }) {
 
       {/* Wordmark */}
       <div className="logo-wordmark">
-        <span className="logo-travel">Travel</span><span className="logo-ease">Ease</span>
+        <span className="logo-travel">Travels</span><span className="logo-ease">Pal</span>
       </div>
     </div>
   );
