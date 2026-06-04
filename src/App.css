@@ -227,9 +227,10 @@ body {
   padding: 0.5rem 1.1rem; font-size: 0.85rem; font-weight: 600;
   cursor: pointer; display: flex; align-items: center; gap: 5px;
   transition: opacity 0.2s; margin-top: 4px;
+  text-decoration: none;
   transform: none !important;
 }
-.fc-book-btn:hover { opacity: 0.88; transform: none !important; }
+.fc-book-btn:hover { opacity: 0.88; transform: none !important; color: #fff; }
 
 /* ── Footer ── */
 .app-footer {

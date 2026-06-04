@@ -10,6 +10,13 @@ import { searchFlights } from './services/flightService';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 
+const TRAVELPAYOUTS_MARKER = '437825';
+
+function buildBookingUrl(flight) {
+  const date = flight.departure?.split(' ')[0] || '';
+  return `https://www.aviasales.com/?origin=${flight.from}&destination=${flight.to}&depart_date=${date}&one_way=y&marker=${TRAVELPAYOUTS_MARKER}`;
+}
+
 const MOCK_FLIGHTS = [
   { airline: 'IndiGo', flightNumber: '6E-1425', from: 'DEL', to: 'DXB', departure: '06:30', arrival: '08:45', duration: 195, stops: 0, price: 15299 },
   { airline: 'Air Arabia', flightNumber: 'G9-412', from: 'DEL', to: 'DXB', departure: '11:15', arrival: '13:40', duration: 205, stops: 0, price: 13850 },
@@ -62,7 +69,14 @@ function FlightCard({ flight, cheapest }) {
       <div className="fc-right">
         <div className="fc-price">₹{flight.price?.toLocaleString('en-IN')}</div>
         <div className="fc-per">per person</div>
-        <button className="fc-book-btn">Book <FiArrowRight size={13} /></button>
+        <a
+          href={buildBookingUrl(flight)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fc-book-btn"
+        >
+          Book <FiArrowRight size={13} />
+        </a>
       </div>
     </div>
   );
