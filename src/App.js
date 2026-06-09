@@ -17,12 +17,6 @@ function buildBookingUrl(flight) {
   return `https://www.aviasales.com/?origin=${flight.from}&destination=${flight.to}&depart_date=${date}&one_way=y&marker=${TRAVELPAYOUTS_MARKER}`;
 }
 
-const MOCK_FLIGHTS = [
-  { airline: 'IndiGo', flightNumber: '6E-1425', from: 'DEL', to: 'DXB', departure: '06:30', arrival: '08:45', duration: 195, stops: 0, price: 15299 },
-  { airline: 'Air Arabia', flightNumber: 'G9-412', from: 'DEL', to: 'DXB', departure: '11:15', arrival: '13:40', duration: 205, stops: 0, price: 13850 },
-  { airline: 'Emirates', flightNumber: 'EK-512', from: 'DEL', to: 'DXB', departure: '14:00', arrival: '16:20', duration: 200, stops: 0, price: 22400 },
-  { airline: 'SpiceJet', flightNumber: 'SG-7210', from: 'DEL', to: 'DXB', departure: '18:30', arrival: '23:10', duration: 280, stops: 1, price: 11600 },
-];
 
 function formatDuration(mins) {
   const h = Math.floor(mins / 60);
@@ -89,7 +83,6 @@ function MainApp({ onGoHome, initialQuery = '' }) {
   const [flights, setFlights] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [usedMock, setUsedMock] = useState(false);
 
   // Auto-search if query came from landing page
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,8 +98,8 @@ function MainApp({ onGoHome, initialQuery = '' }) {
     setFlights(null);
     setUsedMock(false);
 
-    // Step 1: Try to parse via AI
     try {
+      // Step 1: Parse via AI
       const parseRes = await fetch(`${API}/FlightSearch/parse`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -114,49 +107,41 @@ function MainApp({ onGoHome, initialQuery = '' }) {
       });
 
       if (parseRes.status === 401) {
-        // Token expired — still show mock results
-        setFlights(MOCK_FLIGHTS);
-        setUsedMock(true);
+        setError('Session expired. Please sign in again.');
         setLoading(false);
         return;
       }
 
-      if (parseRes.ok) {
-        const parsedData = await parseRes.json();
-        setParsed(parsedData);
-
-        // Step 2: Use parsed IATA codes + date for real search
-        const from = parsedData.from;
-        const to = parsedData.to;
-        const date = parsedData.date || new Date().toISOString().split('T')[0];
-
-        if (from && to) {
-          try {
-            const flightData = await searchFlights(from, to, date, token);
-            if (flightData && flightData.length > 0) {
-              setFlights(flightData);
-            } else {
-              setFlights(MOCK_FLIGHTS);
-              setUsedMock(true);
-            }
-          } catch {
-            setFlights(MOCK_FLIGHTS);
-            setUsedMock(true);
-          }
-        } else {
-          setFlights(MOCK_FLIGHTS);
-          setUsedMock(true);
-        }
+      if (!parseRes.ok) {
+        setError('Could not understand your search. Please try again.');
         setLoading(false);
         return;
+      }
+
+      const parsedData = await parseRes.json();
+      setParsed(parsedData);
+
+      const from = parsedData.from;
+      const to   = parsedData.to;
+      const date = parsedData.date || new Date().toISOString().split('T')[0];
+
+      if (!from || !to) {
+        setError("Couldn't detect origin or destination. Try: \"Flights from Delhi to Mumbai on 28 June\"");
+        setLoading(false);
+        return;
+      }
+
+      // Step 2: Fetch real flights
+      const flightData = await searchFlights(from, to, date, token);
+      if (flightData && flightData.length > 0) {
+        setFlights(flightData);
+      } else {
+        setError(`No flights found for ${from} → ${to} on ${date}. Try a different date or route.`);
       }
     } catch (e) {
-      console.warn('Parse API unreachable:', e.message);
+      setError('Search failed. Please check your connection and try again.');
+      console.error('Search error:', e.message);
     }
-
-    // Fallback if parse failed
-    setFlights(MOCK_FLIGHTS);
-    setUsedMock(true);
 
     setLoading(false);
   };
@@ -218,7 +203,6 @@ function MainApp({ onGoHome, initialQuery = '' }) {
                 <span className="qs-chip">{parsed.to || '—'}</span>
                 {parsed.date && <span className="qs-chip">{parsed.date}</span>}
                 {parsed.maxBudget && <span className="qs-chip">Under ₹{parsed.maxBudget?.toLocaleString('en-IN')}</span>}
-                {usedMock && <span className="qs-mock">· Sample results shown</span>}
               </div>
             )}
 
