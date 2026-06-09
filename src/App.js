@@ -96,7 +96,6 @@ function MainApp({ onGoHome, initialQuery = '' }) {
     setError('');
     setParsed(null);
     setFlights(null);
-    setUsedMock(false);
 
     try {
       // Step 1: Parse via AI
