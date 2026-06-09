@@ -8,8 +8,12 @@ export const searchFlights = async (from, to, date, token, { returnDate, tripTyp
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!response.ok) throw new Error('Failed to fetch flights');
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err || 'Failed to fetch flights');
+  }
   const raw = await response.json();
+  if (raw?.error) throw new Error(raw.error);
   return parseFlights(raw, passengers || 1);
 };
 
