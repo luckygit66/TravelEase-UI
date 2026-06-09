@@ -110,10 +110,16 @@ function MainApp({ onGoHome, initialQuery = '' }) {
     const removeTyping = () => setMessages(prev => prev.filter(m => m.id !== typingId));
 
     try {
+      // Build conversation history (skip greeting + typing indicators, cap at 6)
+      const history = messages
+        .filter(m => m.id !== 0 && !m.typing)
+        .slice(-6)
+        .map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.text }));
+
       const parseRes = await fetch(`${API}/FlightSearch/parse`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(q),
+        body: JSON.stringify({ query: q, history }),
       });
 
       removeTyping();
