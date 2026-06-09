@@ -6,7 +6,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import './App.css';
 import { FiLogOut, FiClock, FiArrowRight, FiSend } from 'react-icons/fi';
-import { searchFlights, exploreDestinations } from './services/flightService';
+import { exploreDestinations } from './services/flightService';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 
@@ -79,7 +79,11 @@ function FlightCard({ flight, cheapest }) {
   );
 }
 
-function DestinationCard({ dest, onSearch }) {
+function buildAviasalesUrl(from, dest) {
+  return `https://www.aviasales.com/?origin=${from}&destination=${dest.code}&depart_date=${dest.date}&one_way=y&marker=${TRAVELPAYOUTS_MARKER}`;
+}
+
+function DestinationCard({ dest, from, onSearch }) {
   return (
     <div className="dest-result-card">
       <div className="drc-left">
@@ -91,9 +95,14 @@ function DestinationCard({ dest, onSearch }) {
       <div className="drc-right">
         <div className="drc-price">from ₹{dest.price.toLocaleString('en-IN')}</div>
         <div className="drc-date">{dest.date}</div>
-        <button className="drc-btn" onClick={() => onSearch(dest)}>
-          Find Flights <FiArrowRight size={12} />
-        </button>
+        <a
+          href={buildAviasalesUrl(from, dest)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="drc-btn"
+        >
+          Book Now <FiArrowRight size={12} />
+        </a>
       </div>
     </div>
   );
@@ -190,18 +199,19 @@ function MainApp({ onGoHome, initialQuery = '' }) {
           setLoading(false); return;
         }
         try {
-          const flights = await searchFlights(from, to, date, token, { returnDate, tripType, passengers: pax });
-          if (flights?.length > 0) {
-            const tripLabel  = tripType === 'roundtrip' ? 'Round trip' : 'One way';
-            const returnInfo = returnDate ? ` · Return ${returnDate}` : '';
+          const month = date ? date.slice(0, 7) : null;
+          const destinations = await exploreDestinations(from, token, { to, month, maxBudget: p.maxBudget });
+          if (destinations?.length > 0) {
+            const tripLabel  = tripType === 'roundtrip' ? ' · Round trip' : '';
             const paxInfo    = pax > 1 ? ` · ${pax} passengers` : '';
             pushMsg({
               role: 'ai',
-              text: `Found ${flights.length} flights · ${from} → ${to} · ${date}${returnInfo} · ${tripLabel}${paxInfo}`,
-              flights,
+              text: `Best prices found · ${from} → ${to}${month ? ` · ${month}` : ''}${tripLabel}${paxInfo}`,
+              destinations,
+              from,
             });
           } else {
-            pushMsg({ role: 'ai', text: `No flights found for ${from} → ${to} on ${date}. Want to try a different date or route?` });
+            pushMsg({ role: 'ai', text: `No fares found for ${from} → ${to}${month ? ` in ${month}` : ''}. Try a different date?` });
           }
         } catch (e) {
           pushMsg({ role: 'ai', text: `Couldn't fetch flights: ${e.message}` });
@@ -262,7 +272,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
                           <DestinationCard
                             key={i}
                             dest={dest}
-                            onSearch={(d) => handleSend(`Flights from ${msg.from} to ${d.code} on ${d.date}`)}
+                            from={msg.from}
                           />
                         ))}
                       </div>
