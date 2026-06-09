@@ -82,10 +82,39 @@ function FlightCard({ flight, cheapest }) {
 }
 
 function buildAviasalesUrl(from, dest, passengers = 1) {
-  // Aviasales search URL format: /search/{origin}{DD}{MM}{destination}{pax}
   const [, month, day] = (dest.date || '').split('-');
   const searchStr = day && month ? `${from}${day}${month}${dest.code}${passengers}` : `${from}0101${dest.code}1`;
   return `https://www.aviasales.com/search/${searchStr}?marker=${TRAVELPAYOUTS_MARKER}`;
+}
+
+function buildRouteUrl(from, to, date, passengers = 1) {
+  const [, month, day] = (date || '').split('-');
+  const searchStr = day && month ? `${from}${day}${month}${to}${passengers}` : `${from}0101${to}1`;
+  return `https://www.aviasales.com/search/${searchStr}?marker=${TRAVELPAYOUTS_MARKER}`;
+}
+
+function RouteSearchCard({ from, to, date, pax }) {
+  return (
+    <div className="dest-result-card" style={{ maxWidth: 360 }}>
+      <div className="drc-left">
+        <div className="drc-code">{from} → {to}</div>
+        <div className="drc-city">Live prices on Aviasales</div>
+        <div className="drc-country">Real-time availability</div>
+      </div>
+      <div className="drc-right">
+        {date && <div className="drc-date">{date}</div>}
+        {pax > 1 && <div className="drc-date">{pax} passengers</div>}
+        <a
+          href={buildRouteUrl(from, to, date, pax)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="drc-btn"
+        >
+          Search Flights <FiArrowRight size={12} />
+        </a>
+      </div>
+    </div>
+  );
 }
 
 function DestinationCard({ dest, from, onSearch }) {
@@ -207,8 +236,8 @@ function MainApp({ onGoHome, initialQuery = '' }) {
           const month = date ? date.slice(0, 7) : null;
           const destinations = await exploreDestinations(from, token, { to, month, maxBudget: p.maxBudget });
           if (destinations?.length > 0) {
-            const tripLabel  = tripType === 'roundtrip' ? ' · Round trip' : '';
-            const paxInfo    = pax > 1 ? ` · ${pax} passengers` : '';
+            const tripLabel = tripType === 'roundtrip' ? ' · Round trip' : '';
+            const paxInfo   = pax > 1 ? ` · ${pax} passengers` : '';
             pushMsg({
               role: 'ai',
               text: `Best prices found · ${from} → ${to}${month ? ` · ${month}` : ''}${tripLabel}${paxInfo}`,
@@ -216,7 +245,12 @@ function MainApp({ onGoHome, initialQuery = '' }) {
               from,
             });
           } else {
-            pushMsg({ role: 'ai', text: `No fares found for ${from} → ${to}${month ? ` in ${month}` : ''}. Try a different date?` });
+            // TravelPayouts has no cached data for this route — send directly to Aviasales
+            pushMsg({
+              role: 'ai',
+              text: `I don't have cached prices for ${from} → ${to} right now. Click below to search live prices on Aviasales:`,
+              routeCard: { from, to, date, pax },
+            });
           }
         } catch (e) {
           pushMsg({ role: 'ai', text: `Couldn't fetch flights: ${e.message}` });
@@ -268,6 +302,11 @@ function MainApp({ onGoHome, initialQuery = '' }) {
                           return <FlightCard key={i} flight={f} cheapest={cheapest} />;
                         })}
                       </div>
+                    </div>
+                  )}
+                  {msg.routeCard && (
+                    <div className="chat-flights">
+                      <RouteSearchCard {...msg.routeCard} />
                     </div>
                   )}
                   {msg.destinations?.length > 0 && (
