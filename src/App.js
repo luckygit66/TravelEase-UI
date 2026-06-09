@@ -13,8 +13,10 @@ const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 const TRAVELPAYOUTS_MARKER = '437825';
 
 function buildBookingUrl(flight) {
-  const date = flight.departure?.split(' ')[0] || '';
-  return `https://www.aviasales.com/?origin=${flight.from}&destination=${flight.to}&depart_date=${date}&one_way=y&marker=${TRAVELPAYOUTS_MARKER}`;
+  const [, month, day] = (flight.departure?.split(' ')[0] || '').split('-');
+  const pax = flight.passengers || 1;
+  const searchStr = day && month ? `${flight.from}${day}${month}${flight.to}${pax}` : `${flight.from}0101${flight.to}1`;
+  return `https://www.aviasales.com/search/${searchStr}?marker=${TRAVELPAYOUTS_MARKER}`;
 }
 
 
@@ -79,8 +81,11 @@ function FlightCard({ flight, cheapest }) {
   );
 }
 
-function buildAviasalesUrl(from, dest) {
-  return `https://www.aviasales.com/?origin=${from}&destination=${dest.code}&depart_date=${dest.date}&one_way=y&marker=${TRAVELPAYOUTS_MARKER}`;
+function buildAviasalesUrl(from, dest, passengers = 1) {
+  // Aviasales search URL format: /search/{origin}{DD}{MM}{destination}{pax}
+  const [, month, day] = (dest.date || '').split('-');
+  const searchStr = day && month ? `${from}${day}${month}${dest.code}${passengers}` : `${from}0101${dest.code}1`;
+  return `https://www.aviasales.com/search/${searchStr}?marker=${TRAVELPAYOUTS_MARKER}`;
 }
 
 function DestinationCard({ dest, from, onSearch }) {
