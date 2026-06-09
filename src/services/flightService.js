@@ -1,15 +1,19 @@
 const BASE_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:5055/api'}/FlightAggregator`;
 
-export const searchFlights = async (from, to, date, token) => {
-  const response = await fetch(`${BASE_URL}/search?from=${from}&to=${to}&date=${date}`, {
+export const searchFlights = async (from, to, date, token, { returnDate, tripType, passengers } = {}) => {
+  let url = `${BASE_URL}/search?from=${from}&to=${to}&date=${date}`;
+  if (tripType)    url += `&tripType=${tripType}`;
+  if (returnDate)  url += `&returnDate=${returnDate}`;
+  if (passengers)  url += `&passengers=${passengers}`;
+  const response = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` }
   });
   if (!response.ok) throw new Error('Failed to fetch flights');
   const raw = await response.json();
-  return parseFlights(raw);
+  return parseFlights(raw, passengers || 1);
 };
 
-function parseFlights(raw) {
+function parseFlights(raw, passengers = 1) {
   try {
     const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
     const all = [
@@ -21,6 +25,7 @@ function parseFlights(raw) {
       const firstLeg = legs[0] || {};
       const lastLeg = legs[legs.length - 1] || firstLeg;
       const stops = legs.length - 1;
+      const pricePerPerson = item.price || null;
 
       return {
         airline: firstLeg.airline || 'Unknown Airline',
@@ -35,7 +40,9 @@ function parseFlights(raw) {
         duration: item.total_duration || 0,
         stops,
         stopCities: legs.slice(0, -1).map(l => l.arrival_airport?.id).filter(Boolean),
-        price: item.price || null,
+        price: pricePerPerson,
+        totalPrice: pricePerPerson ? pricePerPerson * passengers : null,
+        passengers,
       };
     }).filter(f => f.price);
   } catch {

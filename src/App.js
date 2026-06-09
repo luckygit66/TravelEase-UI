@@ -63,6 +63,9 @@ function FlightCard({ flight, cheapest }) {
       <div className="fc-right">
         <div className="fc-price">₹{flight.price?.toLocaleString('en-IN')}</div>
         <div className="fc-per">per person</div>
+        {flight.passengers > 1 && (
+          <div className="fc-total">₹{flight.totalPrice?.toLocaleString('en-IN')} total</div>
+        )}
         <a
           href={buildBookingUrl(flight)}
           target="_blank"
@@ -120,9 +123,12 @@ function MainApp({ onGoHome, initialQuery = '' }) {
       const parsedData = await parseRes.json();
       setParsed(parsedData);
 
-      const from = parsedData.from;
-      const to   = parsedData.to;
-      const date = parsedData.date || new Date().toISOString().split('T')[0];
+      const from       = parsedData.from;
+      const to         = parsedData.to;
+      const date       = parsedData.date || new Date().toISOString().split('T')[0];
+      const returnDate = parsedData.returnDate || null;
+      const tripType   = parsedData.tripType || 'oneway';
+      const passengers = parsedData.passengers || 1;
 
       if (!from || !to) {
         setError("Couldn't detect origin or destination. Try: \"Flights from Delhi to Mumbai on 28 June\"");
@@ -131,7 +137,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
       }
 
       // Step 2: Fetch real flights
-      const flightData = await searchFlights(from, to, date, token);
+      const flightData = await searchFlights(from, to, date, token, { returnDate, tripType, passengers });
       if (flightData && flightData.length > 0) {
         setFlights(flightData);
       } else {
@@ -201,6 +207,9 @@ function MainApp({ onGoHome, initialQuery = '' }) {
                 <FiArrowRight size={13} color="#888" />
                 <span className="qs-chip">{parsed.to || '—'}</span>
                 {parsed.date && <span className="qs-chip">{parsed.date}</span>}
+                {parsed.tripType === 'roundtrip' && parsed.returnDate && <span className="qs-chip">↩ {parsed.returnDate}</span>}
+                {parsed.passengers > 1 && <span className="qs-chip">{parsed.passengers} passengers</span>}
+                {parsed.tripType && <span className="qs-chip">{parsed.tripType === 'roundtrip' ? 'Round trip' : 'One way'}</span>}
                 {parsed.maxBudget && <span className="qs-chip">Under ₹{parsed.maxBudget?.toLocaleString('en-IN')}</span>}
               </div>
             )}
