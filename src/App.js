@@ -170,7 +170,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
       const p = await parseRes.json();
       const from = p.from, to = p.to;
       const date = p.date || new Date().toISOString().split('T')[0];
-      const { returnDate, tripType, passengers } = p;
+      const { tripType, passengers } = p;
       const pax = passengers || 1;
 
       const intent = p.searchIntent || (to ? 'route' : 'explore');
