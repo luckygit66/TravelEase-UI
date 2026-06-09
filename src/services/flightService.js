@@ -1,5 +1,17 @@
 const BASE_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:5055/api'}/FlightAggregator`;
 
+export const exploreDestinations = async (from, token, { month, maxBudget } = {}) => {
+  let url = `${BASE_URL}/explore?from=${from}`;
+  if (month)     url += `&month=${month}`;
+  if (maxBudget) url += `&maxBudget=${maxBudget}`;
+  const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err || 'Failed to explore destinations');
+  }
+  return response.json();
+};
+
 export const searchFlights = async (from, to, date, token, { returnDate, tripType, passengers } = {}) => {
   let url = `${BASE_URL}/search?from=${from}&to=${to}&date=${date}`;
   if (tripType)    url += `&tripType=${tripType}`;

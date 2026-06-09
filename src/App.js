@@ -6,7 +6,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import './App.css';
 import { FiLogOut, FiClock, FiArrowRight, FiSend } from 'react-icons/fi';
-import { searchFlights } from './services/flightService';
+import { searchFlights, exploreDestinations } from './services/flightService';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 
@@ -79,6 +79,26 @@ function FlightCard({ flight, cheapest }) {
   );
 }
 
+function DestinationCard({ dest, onSearch }) {
+  return (
+    <div className="dest-result-card">
+      <div className="drc-left">
+        <div className="drc-code">{dest.code}</div>
+        <div className="drc-city">{dest.city}</div>
+        <div className="drc-country">{dest.country}</div>
+        <div className="drc-meta">{dest.stops === 0 ? 'Direct' : `${dest.stops} stop`} · {dest.airline}</div>
+      </div>
+      <div className="drc-right">
+        <div className="drc-price">from ₹{dest.price.toLocaleString('en-IN')}</div>
+        <div className="drc-date">{dest.date}</div>
+        <button className="drc-btn" onClick={() => onSearch(dest)}>
+          Find Flights <FiArrowRight size={12} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function MainApp({ onGoHome, initialQuery = '' }) {
   const { token, user, logout } = useAuth();
   const firstName = user?.firstName || 'there';
@@ -139,27 +159,53 @@ function MainApp({ onGoHome, initialQuery = '' }) {
       const { returnDate, tripType, passengers } = p;
       const pax = passengers || 1;
 
-      if (!from || !to) {
-        pushMsg({ role: 'ai', text: "I couldn't detect origin or destination. Could you be more specific? e.g. \"Flights from Delhi to Mumbai on 28 June\"" });
-        setLoading(false); return;
-      }
+      const intent = p.searchIntent || (to ? 'route' : 'explore');
 
-      try {
-        const flights = await searchFlights(from, to, date, token, { returnDate, tripType, passengers: pax });
-        if (flights?.length > 0) {
-          const tripLabel  = tripType === 'roundtrip' ? 'Round trip' : 'One way';
-          const returnInfo = returnDate ? ` · Return ${returnDate}` : '';
-          const paxInfo    = pax > 1 ? ` · ${pax} passengers` : '';
-          pushMsg({
-            role: 'ai',
-            text: `Found ${flights.length} flights · ${from} → ${to} · ${date}${returnInfo} · ${tripLabel}${paxInfo}`,
-            flights,
-          });
-        } else {
-          pushMsg({ role: 'ai', text: `No flights found for ${from} → ${to} on ${date}. Want to try a different date or route?` });
+      if (intent === 'explore') {
+        if (!from) {
+          pushMsg({ role: 'ai', text: "Which city would you like to fly from?" });
+          setLoading(false); return;
         }
-      } catch (e) {
-        pushMsg({ role: 'ai', text: `Couldn't fetch flights: ${e.message}` });
+        try {
+          const month = date ? date.slice(0, 7) : null;
+          const destinations = await exploreDestinations(from, token, { month, maxBudget: p.maxBudget });
+          if (destinations?.length > 0) {
+            const budgetInfo = p.maxBudget ? ` under ₹${p.maxBudget.toLocaleString('en-IN')}` : '';
+            const monthInfo  = month ? ` in ${month}` : '';
+            pushMsg({
+              role: 'ai',
+              text: `Here are the cheapest destinations from ${from}${monthInfo}${budgetInfo}. Click any to search flights:`,
+              destinations,
+              from,
+            });
+          } else {
+            pushMsg({ role: 'ai', text: `Couldn't find destinations from ${from}. Try a different month or budget.` });
+          }
+        } catch (e) {
+          pushMsg({ role: 'ai', text: `Couldn't explore destinations: ${e.message}` });
+        }
+      } else {
+        if (!from || !to) {
+          pushMsg({ role: 'ai', text: "I couldn't detect origin or destination. Try: \"Flights from Delhi to Mumbai on 28 June\"" });
+          setLoading(false); return;
+        }
+        try {
+          const flights = await searchFlights(from, to, date, token, { returnDate, tripType, passengers: pax });
+          if (flights?.length > 0) {
+            const tripLabel  = tripType === 'roundtrip' ? 'Round trip' : 'One way';
+            const returnInfo = returnDate ? ` · Return ${returnDate}` : '';
+            const paxInfo    = pax > 1 ? ` · ${pax} passengers` : '';
+            pushMsg({
+              role: 'ai',
+              text: `Found ${flights.length} flights · ${from} → ${to} · ${date}${returnInfo} · ${tripLabel}${paxInfo}`,
+              flights,
+            });
+          } else {
+            pushMsg({ role: 'ai', text: `No flights found for ${from} → ${to} on ${date}. Want to try a different date or route?` });
+          }
+        } catch (e) {
+          pushMsg({ role: 'ai', text: `Couldn't fetch flights: ${e.message}` });
+        }
       }
     } catch (e) {
       removeTyping();
@@ -206,6 +252,19 @@ function MainApp({ onGoHome, initialQuery = '' }) {
                           const cheapest = f.price === Math.min(...msg.flights.map(x => x.price || Infinity));
                           return <FlightCard key={i} flight={f} cheapest={cheapest} />;
                         })}
+                      </div>
+                    </div>
+                  )}
+                  {msg.destinations?.length > 0 && (
+                    <div className="chat-flights">
+                      <div className="dest-results-grid">
+                        {msg.destinations.map((dest, i) => (
+                          <DestinationCard
+                            key={i}
+                            dest={dest}
+                            onSearch={(d) => handleSend(`Flights from ${msg.from} to ${d.code} on ${d.date}`)}
+                          />
+                        ))}
                       </div>
                     </div>
                   )}
