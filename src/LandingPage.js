@@ -34,6 +34,12 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
 
       <nav className="lp-nav">
         <div className="lp-nav-logo"><Logo /></div>
+        <div className="lp-nav-links">
+          <a href="#deals" className="lp-nav-link">✈️ Today's Deals</a>
+          <a href="https://t.me/TravelsPalDeals" target="_blank" rel="noopener noreferrer" className="lp-nav-link lp-nav-link-tg">
+            Join Telegram →
+          </a>
+        </div>
         <div className="lp-nav-actions">
           {user ? (
             <>
@@ -84,7 +90,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
       </section>
 
       {deals.length > 0 && (
-        <section className="lp-section lp-deals-section">
+        <section id="deals" className="lp-section lp-deals-section">
           <h2>✈️ Today's Flight Deals</h2>
           <p className="lp-deals-subtitle">Live prices updated every morning from top Indian cities</p>
           <div className="deals-grid">
