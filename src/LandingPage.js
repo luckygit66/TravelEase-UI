@@ -137,6 +137,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
                 <span className="dest-code">{d.code}</span>
                 <h3>{d.name}</h3>
                 <p>{d.country}</p>
+                <span className="dest-card-cta">Search flights →</span>
               </div>
             </div>
           ))}
