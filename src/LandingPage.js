@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './LandingPage.css';
 import { FiSearch, FiTrendingDown, FiShield, FiLogOut } from 'react-icons/fi';
 import { useAuth } from './contexts/AuthContext';
@@ -27,6 +27,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
   const { user, logout } = useAuth();
   const [query, setQuery] = useState('');
   const [deals, setDeals] = useState([]);
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     fetch(`${API_BASE}/Cache/deals`)
@@ -37,6 +38,12 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
 
   const handleSearch = () => {
     onGetStarted(query.trim() || null);
+  };
+
+  const handleDestinationClick = (cityName) => {
+    setQuery(`Flights to ${cityName}`);
+    searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => searchInputRef.current?.focus(), 400);
   };
 
   return (
@@ -77,6 +84,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
             <div className="lp-input-group">
               <span className="input-icon">✈️</span>
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder='e.g. "Flights from Delhi to Bangkok next week under ₹20,000"'
                 value={query}
@@ -153,7 +161,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
               className="dest-card"
               key={d.code}
               style={{ background: d.gradient }}
-              onClick={() => onGetStarted(`Flights to ${d.name}`)}
+              onClick={() => handleDestinationClick(d.name)}
             >
               <div className="dest-card-icon">{d.icon}</div>
               <div className="dest-card-body">
