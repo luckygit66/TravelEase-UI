@@ -1,0 +1,36 @@
+<svg width="512" height="512" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoBg" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#060d1f"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+    <linearGradient id="arcGrad" x1="10" y1="34" x2="36" y2="11" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="44" height="44" rx="10" fill="url(#logoBg)"/>
+
+  <!-- Globe wireframe -->
+  <circle cx="22" cy="23" r="12" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <ellipse cx="22" cy="23" rx="12" ry="4.5" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <ellipse cx="22" cy="23" rx="6" ry="12" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+
+  <!-- Flight arc -->
+  <path d="M10 34 C14 16 26 10 36 12" stroke="url(#arcGrad)" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Plane at arrival -->
+  <g transform="translate(36,12) rotate(-30)">
+    <ellipse rx="1" ry="4" fill="white"/>
+    <path d="M0 -1.5 L-5 1 L-4 2.5 L0 1 Z" fill="white" opacity="0.9"/>
+    <path d="M0 -1.5 L5 1 L4 2.5 L0 1 Z" fill="white" opacity="0.9"/>
+    <path d="M-0.8 2.8 L-3 5.5 L-2 5.5 L-0.8 3.8 Z" fill="white" opacity="0.6"/>
+    <path d="M0.8 2.8 L3 5.5 L2 5.5 L0.8 3.8 Z" fill="white" opacity="0.6"/>
+  </g>
+
+  <!-- Departure dot -->
+  <circle cx="10" cy="34" r="2.2" fill="#60a5fa"/>
+  <circle cx="10" cy="34" r="1.1" fill="white"/>
+</svg>
