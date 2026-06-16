@@ -101,7 +101,10 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
 
       {deals.length > 0 && (
         <section id="deals" className="lp-section lp-deals-section">
-          <h2>✈️ Today's Flight Deals</h2>
+          <h2>
+            <img src="/logo.svg" alt="" width="32" height="32" style={{ verticalAlign: 'middle', marginRight: '0.5rem' }} />
+            Today's Flight Deals
+          </h2>
           <p className="lp-deals-subtitle">Live prices updated every morning from top Indian cities</p>
           <div className="deals-grid">
             {deals.map((d, i) => (
