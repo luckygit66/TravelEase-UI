@@ -470,6 +470,23 @@
   color: #bbb;
 }
 
+.deal-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.badge-score, .badge-visa {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.badge-score.amazing { background: #fff3cd; color: #92400e; }
+.badge-score.good    { background: #e6f7ee; color: #0a8042; }
+.badge-visa          { background: #e0f2fe; color: #0369a1; }
+
 .deal-cta {
   margin-top: auto;
   padding-top: 0.6rem;

@@ -139,6 +139,11 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
                     </span>
                     {d.airline && <span className="deal-airline">{d.airline}</span>}
                   </div>
+                  <div className="deal-badges">
+                    {d.dealScore === 'amazing' && <span className="badge-score amazing">🔥 Amazing</span>}
+                    {d.dealScore === 'good'    && <span className="badge-score good">✅ Good Deal</span>}
+                    {d.isVisaFree             && <span className="badge-visa">🟢 No Visa</span>}
+                  </div>
                   <div className="deal-cta">Book Now ↗</div>
                 </div>
               </a>
