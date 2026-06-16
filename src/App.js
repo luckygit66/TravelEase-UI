@@ -211,13 +211,14 @@ function MainApp({ onGoHome, initialQuery = '' }) {
         }
         try {
           const month = date ? date.slice(0, 7) : null;
-          const destinations = await exploreDestinations(from, token, { month, maxBudget: p.maxBudget });
+          const destinations = await exploreDestinations(from, token, { month, maxBudget: p.maxBudget, visaFree: p.visaFree });
           if (destinations?.length > 0) {
             const budgetInfo = p.maxBudget ? ` under ₹${p.maxBudget.toLocaleString('en-IN')}` : '';
             const monthInfo  = month ? ` in ${month}` : '';
+            const visaInfo   = p.visaFree ? ' (visa-free for Indians)' : '';
             pushMsg({
               role: 'ai',
-              text: `Here are the cheapest destinations from ${from}${monthInfo}${budgetInfo}. Click any to search flights:`,
+              text: `Here are the cheapest destinations from ${from}${monthInfo}${budgetInfo}${visaInfo}. Click any to search flights:`,
               destinations,
               from,
             });
@@ -238,7 +239,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
         }
         try {
           const month = date ? date.slice(0, 7) : null;
-          const destinations = await exploreDestinations(from, token, { to, month, maxBudget: p.maxBudget });
+          const destinations = await exploreDestinations(from, token, { to, month, maxBudget: p.maxBudget, visaFree: p.visaFree });
           if (destinations?.length > 0) {
             const tripLabel = tripType === 'roundtrip' ? ' · Round trip' : '';
             const paxInfo   = pax > 1 ? ` · ${pax} passengers` : '';

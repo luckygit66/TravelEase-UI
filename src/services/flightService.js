@@ -1,10 +1,11 @@
 const BASE_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:5055/api'}/FlightAggregator`;
 
-export const exploreDestinations = async (from, token, { to, month, maxBudget } = {}) => {
+export const exploreDestinations = async (from, token, { to, month, maxBudget, visaFree } = {}) => {
   let url = `${BASE_URL}/explore?from=${from}`;
   if (to)        url += `&to=${to}`;
   if (month)     url += `&month=${month}`;
   if (maxBudget) url += `&maxBudget=${maxBudget}`;
+  if (visaFree)  url += `&visaFree=true`;
   const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
   if (!response.ok) {
     const err = await response.text();
