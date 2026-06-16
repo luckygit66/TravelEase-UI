@@ -118,7 +118,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
                 <div className="deal-card-header" style={{ background: DEAL_GRADIENTS[i % DEAL_GRADIENTS.length] }}>
                   <div className="deal-card-route">
                     <span>{d.originCity}</span>
-                    <span className="deal-arrow">✈️</span>
+                    <img src="/logo.svg" alt="" width="18" height="18" style={{ verticalAlign: 'middle', opacity: 0.9 }} />
                     <span>{d.destinationCity}</span>
                   </div>
                   <div className="deal-country">{d.country}</div>
