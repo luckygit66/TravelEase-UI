@@ -130,7 +130,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
               className="dest-card"
               key={d.code}
               style={{ background: d.gradient }}
-              onClick={onGetStarted}
+              onClick={() => onGetStarted(`Flights to ${d.name}`)}
             >
               <div className="dest-card-icon">{d.icon}</div>
               <div className="dest-card-body">
