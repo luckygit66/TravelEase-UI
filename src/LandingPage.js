@@ -76,7 +76,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
           <div className="lp-ai-hint">
             <FiSearch size={13} />
             <span>Try: </span>
-            <em>"Cheapest flight from Lahore to London in July"</em>
+            <em>"Cheapest flight from Delhi to Dubai in December"</em>
             <span>&nbsp;·&nbsp;</span>
             <em>"Dubai se Bangkok ka sasta ticket"</em>
           </div>
