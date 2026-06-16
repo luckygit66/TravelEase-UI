@@ -6,6 +6,16 @@ import Logo from './components/Logo';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 
+const DEAL_GRADIENTS = [
+  'linear-gradient(135deg, #1a6cf0 0%, #7c3aed 100%)',
+  'linear-gradient(135deg, #0891b2 0%, #1a6cf0 100%)',
+  'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)',
+  'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
+  'linear-gradient(135deg, #059669 0%, #0891b2 100%)',
+  'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)',
+  'linear-gradient(135deg, #ec4899 0%, #f97316 100%)',
+];
+
 const destinations = [
   { name: 'Dubai', country: 'UAE', code: 'DXB', icon: '🏙️', gradient: 'linear-gradient(160deg, #f093fb 0%, #f5576c 100%)' },
   { name: 'London', country: 'UK', code: 'LHR', icon: '🎡', gradient: 'linear-gradient(160deg, #4facfe 0%, #00b4d8 100%)' },
@@ -94,7 +104,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
           <h2>✈️ Today's Flight Deals</h2>
           <p className="lp-deals-subtitle">Live prices updated every morning from top Indian cities</p>
           <div className="deals-grid">
-            {deals.map(d => (
+            {deals.map((d, i) => (
               <a
                 key={d.origin + d.destination}
                 href={d.bookUrl}
@@ -102,20 +112,24 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
                 rel="noopener noreferrer"
                 className="deal-card"
               >
-                <div className="deal-card-route">
-                  <span className="deal-origin">{d.originCity}</span>
-                  <span className="deal-arrow">→</span>
-                  <span className="deal-dest">{d.destinationCity}</span>
+                <div className="deal-card-header" style={{ background: DEAL_GRADIENTS[i % DEAL_GRADIENTS.length] }}>
+                  <div className="deal-card-route">
+                    <span>{d.originCity}</span>
+                    <span className="deal-arrow">✈️</span>
+                    <span>{d.destinationCity}</span>
+                  </div>
+                  <div className="deal-country">{d.country}</div>
                 </div>
-                <div className="deal-country">{d.country}</div>
-                <div className="deal-price">₹{d.price.toLocaleString('en-IN')}</div>
-                <div className="deal-meta">
-                  <span className={`deal-stops ${d.stops === 0 ? 'direct' : ''}`}>
-                    {d.stops === 0 ? 'Direct' : `${d.stops} stop`}
-                  </span>
-                  {d.airline && <span className="deal-airline">{d.airline}</span>}
+                <div className="deal-card-body">
+                  <div className="deal-price">₹{d.price.toLocaleString('en-IN')}</div>
+                  <div className="deal-meta">
+                    <span className={`deal-stops ${d.stops === 0 ? 'direct' : ''}`}>
+                      {d.stops === 0 ? 'Direct' : `${d.stops} stop`}
+                    </span>
+                    {d.airline && <span className="deal-airline">{d.airline}</span>}
+                  </div>
+                  <div className="deal-cta">Book Now ↗</div>
                 </div>
-                <div className="deal-cta">Book Now ↗</div>
               </a>
             ))}
           </div>
