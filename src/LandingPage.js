@@ -1,19 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './LandingPage.css';
 import { FiSearch, FiTrendingDown, FiShield, FiLogOut } from 'react-icons/fi';
 import { useAuth } from './contexts/AuthContext';
 import Logo from './components/Logo';
 
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
+
 const destinations = [
-  { name: 'Dubai', country: 'UAE', code: 'DXB', price: 'From ₹15,000', icon: '🏙️', gradient: 'linear-gradient(160deg, #f093fb 0%, #f5576c 100%)' },
-  { name: 'London', country: 'UK', code: 'LHR', price: 'From ₹45,000', icon: '🎡', gradient: 'linear-gradient(160deg, #4facfe 0%, #00b4d8 100%)' },
-  { name: 'Toronto', country: 'Canada', code: 'YYZ', price: 'From ₹65,000', icon: '🍁', gradient: 'linear-gradient(160deg, #43e97b 0%, #0ba360 100%)' },
-  { name: 'Bangkok', country: 'Thailand', code: 'BKK', price: 'From ₹12,000', icon: '⛩️', gradient: 'linear-gradient(160deg, #fa709a 0%, #fee140 100%)' },
+  { name: 'Dubai', country: 'UAE', code: 'DXB', icon: '🏙️', gradient: 'linear-gradient(160deg, #f093fb 0%, #f5576c 100%)' },
+  { name: 'London', country: 'UK', code: 'LHR', icon: '🎡', gradient: 'linear-gradient(160deg, #4facfe 0%, #00b4d8 100%)' },
+  { name: 'Toronto', country: 'Canada', code: 'YYZ', icon: '🍁', gradient: 'linear-gradient(160deg, #43e97b 0%, #0ba360 100%)' },
+  { name: 'Bangkok', country: 'Thailand', code: 'BKK', icon: '⛩️', gradient: 'linear-gradient(160deg, #fa709a 0%, #fee140 100%)' },
 ];
 
 function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
   const { user, logout } = useAuth();
   const [query, setQuery] = useState('');
+  const [deals, setDeals] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/Cache/deals`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setDeals(Array.isArray(data) ? data : []))
+      .catch(err => console.error('Deals fetch failed:', err));
+  }, []);
 
   const handleSearch = () => {
     onGetStarted(query.trim() || null);
@@ -73,6 +83,45 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
         </div>
       </section>
 
+      {deals.length > 0 && (
+        <section className="lp-section lp-deals-section">
+          <h2>✈️ Today's Flight Deals</h2>
+          <p className="lp-deals-subtitle">Live prices updated every morning from top Indian cities</p>
+          <div className="deals-grid">
+            {deals.map(d => (
+              <a
+                key={d.origin + d.destination}
+                href={d.bookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="deal-card"
+              >
+                <div className="deal-card-route">
+                  <span className="deal-origin">{d.originCity}</span>
+                  <span className="deal-arrow">→</span>
+                  <span className="deal-dest">{d.destinationCity}</span>
+                </div>
+                <div className="deal-country">{d.country}</div>
+                <div className="deal-price">₹{d.price.toLocaleString('en-IN')}</div>
+                <div className="deal-meta">
+                  <span className={`deal-stops ${d.stops === 0 ? 'direct' : ''}`}>
+                    {d.stops === 0 ? 'Direct' : `${d.stops} stop`}
+                  </span>
+                  {d.airline && <span className="deal-airline">{d.airline}</span>}
+                </div>
+                <div className="deal-cta">Book Now ↗</div>
+              </a>
+            ))}
+          </div>
+          <div className="deals-telegram-cta">
+            <span>Get these deals every morning for free</span>
+            <a href="https://t.me/TravelsPalDeals" target="_blank" rel="noopener noreferrer">
+              Join on Telegram →
+            </a>
+          </div>
+        </section>
+      )}
+
       <section className="lp-section">
         <h2>Popular Destinations</h2>
         <div className="dest-grid">
@@ -88,7 +137,6 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
                 <span className="dest-code">{d.code}</span>
                 <h3>{d.name}</h3>
                 <p>{d.country}</p>
-                <span className="dest-price">{d.price}</span>
               </div>
             </div>
           ))}
