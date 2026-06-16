@@ -228,6 +228,10 @@ function MainApp({ onGoHome, initialQuery = '' }) {
           pushMsg({ role: 'ai', text: `Couldn't explore destinations: ${e.message}` });
         }
       } else {
+        if (!from && to) {
+          pushMsg({ role: 'ai', text: `Which city are you flying from? For example: "Flights from Delhi to ${to}"` });
+          setLoading(false); return;
+        }
         if (!from || !to) {
           pushMsg({ role: 'ai', text: "I couldn't detect origin or destination. Try: \"Flights from Delhi to Mumbai on 28 June\"" });
           setLoading(false); return;

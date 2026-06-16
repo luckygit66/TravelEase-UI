@@ -41,7 +41,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
   };
 
   const handleDestinationClick = (cityName) => {
-    setQuery(`Flights to ${cityName}`);
+    setQuery(`Flights from Delhi to ${cityName}`);
     searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setTimeout(() => searchInputRef.current?.focus(), 400);
   };
