@@ -375,6 +375,11 @@
       var rawDate = p.date || new Date().toISOString();
       var month = rawDate.slice(0, 7);
 
+      // LLM sometimes swaps from/to on explore queries (e.g. "from Mumbai" → to=BOM, from=null)
+      if (intent === 'explore' && !from && to) { from = to; to = null; }
+      // Also handle: intent=route but no from — treat as explore
+      if (intent !== 'calendar' && !from && to) { from = to; to = null; intent = 'explore'; }
+
       if (intent === 'explore' && from) {
         var url = API + '/FlightAggregator/explore?from=' + from;
         if (p.maxBudget) url += '&maxBudget=' + p.maxBudget;
@@ -413,11 +418,13 @@
         aiMsg('Please tell me your departure city. Example: "Delhi to Bangkok" or "Cheapest flights from Mumbai".');
       }
 
-      hist.push({ role: 'assistant', content: '[Results shown]' });
+      // Only record successful exchanges in history — failed parses confuse LLM on follow-ups
+      hist.push({ role: 'assistant', content: 'Results shown for: ' + text });
 
     } catch (e) {
       t && t.remove();
       aiMsg('Something went wrong. Please try again.');
+      hist.pop(); // remove the user message we pushed since we never got a result
     }
     done();
   }
@@ -428,7 +435,7 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
   }
 
-  function scrollBot() { var m = document.getElementById('wm'); m.scrollTop = m.scrollHeight; }
+  function scrollBot() { requestAnimationFrame(function() { var m = document.getElementById('wm'); m.scrollTop = m.scrollHeight; }); }
 
   function userMsg(t) {
     var m = document.getElementById('wm');
