@@ -79,7 +79,14 @@ function RegisterPage({ onSuccess, onGoLogin, onGoHome }) {
             />
           </div>
 
-          {error && <div className="auth-error">{error}</div>}
+          {error && (
+            <div className="auth-error">
+              {error}
+              {error.toLowerCase().includes('already exists') && (
+                <> &nbsp;<span style={{textDecoration:'underline',cursor:'pointer'}} onClick={onGoLogin}>Sign in instead →</span></>
+              )}
+            </div>
+          )}
 
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? 'Creating account…' : 'Create Account'}
