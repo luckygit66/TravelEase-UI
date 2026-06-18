@@ -211,7 +211,9 @@ function MainApp({ onGoHome, initialQuery = '' }) {
           pushMsg({ role: 'ai', text: "Please tell me both origin and destination for the price calendar. Try: \"Cheapest days to fly Delhi to Bangkok in July\"" });
           setLoading(false); return;
         }
-        const month = date ? date.slice(0, 7) : new Date().toISOString().slice(0, 7);
+        // Ensure YYYY-MM format — LLM sometimes returns non-standard date strings
+        const rawMonth = date ? date.slice(0, 7) : null;
+        const month = /^\d{4}-\d{2}$/.test(rawMonth || '') ? rawMonth : new Date().toISOString().slice(0, 7);
         try {
           const days = await getPriceCalendar(from, to, month, token);
           if (days?.length > 0) {
