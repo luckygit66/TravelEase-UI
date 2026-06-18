@@ -6,7 +6,7 @@ const MONTH_NAMES = ['January','February','March','April','May','June',
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 function buildAviasalesUrl(from, to, date) {
-  const [y, m, d] = date.split('-');
+  const [, m, d] = date.split('-');
   return `https://www.aviasales.com/search/${from}${d}${m}${to}1?marker=437825`;
 }
 
