@@ -363,6 +363,10 @@ function AppRouter() {
   const [page, setPage] = useState('landing');
   const [initialQuery, setInitialQuery] = useState('');
 
+  useEffect(() => {
+    if (!token && page === 'app') setPage('login');
+  }, [token, page]);
+
   const goToApp = (query = '') => {
     setInitialQuery(query || '');
     setPage('app');
