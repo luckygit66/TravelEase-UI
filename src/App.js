@@ -258,7 +258,10 @@ function MainApp({ onGoHome, initialQuery = '' }) {
             });
           }
         } catch (e) {
-          pushMsg({ role: 'ai', text: `Couldn't fetch flights: ${e.message}` });
+          const msg = e.message?.toLowerCase().includes('equal') || e.message?.toLowerCase().includes('same airport')
+            ? "Origin and destination appear to be the same city. Please try two different cities."
+            : `Couldn't fetch flights: ${e.message}`;
+          pushMsg({ role: 'ai', text: msg });
         }
       }
     } catch (e) {
