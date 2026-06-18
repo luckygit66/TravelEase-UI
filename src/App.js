@@ -6,7 +6,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import './App.css';
 import { FiLogOut, FiClock, FiArrowRight, FiSend } from 'react-icons/fi';
-import { exploreDestinations } from './services/flightService';
+import { exploreDestinations, getPriceCalendar } from './services/flightService';
+import CalendarView from './components/CalendarView';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 
@@ -205,7 +206,27 @@ function MainApp({ onGoHome, initialQuery = '' }) {
 
       const intent = p.searchIntent || (to ? 'route' : 'explore');
 
-      if (intent === 'explore') {
+      if (intent === 'calendar') {
+        if (!from || !to) {
+          pushMsg({ role: 'ai', text: "Please tell me both origin and destination for the price calendar. Try: \"Cheapest days to fly Delhi to Bangkok in July\"" });
+          setLoading(false); return;
+        }
+        const month = date ? date.slice(0, 7) : new Date().toISOString().slice(0, 7);
+        try {
+          const days = await getPriceCalendar(from, to, month, token);
+          if (days?.length > 0) {
+            pushMsg({
+              role: 'ai',
+              text: `Price calendar for ${from} → ${to} in ${month}. Click any date to book on Aviasales:`,
+              calendarData: { from, to, month, days },
+            });
+          } else {
+            pushMsg({ role: 'ai', text: `No calendar data found for ${from} → ${to} in ${month}. Try a different month.` });
+          }
+        } catch (e) {
+          pushMsg({ role: 'ai', text: `Couldn't load price calendar: ${e.message}` });
+        }
+      } else if (intent === 'explore') {
         if (!from) {
           pushMsg({ role: 'ai', text: "Which city would you like to fly from?" });
           setLoading(false); return;
@@ -229,7 +250,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
         } catch (e) {
           pushMsg({ role: 'ai', text: `Couldn't explore destinations: ${e.message}` });
         }
-      } else {
+      } else {  // route
         if (!from && to) {
           pushMsg({ role: 'ai', text: `Which city are you flying from? For example: "Flights from Delhi to ${to}"` });
           setLoading(false); return;
@@ -311,6 +332,11 @@ function MainApp({ onGoHome, initialQuery = '' }) {
                           return <FlightCard key={i} flight={f} cheapest={cheapest} />;
                         })}
                       </div>
+                    </div>
+                  )}
+                  {msg.calendarData && (
+                    <div className="chat-flights">
+                      <CalendarView {...msg.calendarData} />
                     </div>
                   )}
                   {msg.routeCard && (

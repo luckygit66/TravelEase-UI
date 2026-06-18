@@ -14,6 +14,16 @@ export const exploreDestinations = async (from, token, { to, month, maxBudget, v
   return response.json();
 };
 
+export const getPriceCalendar = async (from, to, month, token) => {
+  const url = `${BASE_URL}/calendar?from=${from}&to=${to}&month=${month}`;
+  const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err || 'Failed to fetch price calendar');
+  }
+  return response.json();
+};
+
 export const searchFlights = async (from, to, date, token, { returnDate, tripType, passengers } = {}) => {
   let url = `${BASE_URL}/search?from=${from}&to=${to}&date=${date}`;
   if (tripType)    url += `&tripType=${tripType}`;

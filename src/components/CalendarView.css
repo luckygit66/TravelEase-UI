@@ -1,0 +1,127 @@
+.cal-wrapper {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e4e8f0;
+  overflow: hidden;
+  font-size: 0.82rem;
+  max-width: 480px;
+}
+
+.cal-header {
+  background: linear-gradient(135deg, #1a6cf0 0%, #4f46e5 100%);
+  color: #fff;
+  padding: 0.9rem 1.1rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cal-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.cal-cheapest-label {
+  font-size: 0.78rem;
+  opacity: 0.9;
+}
+
+.cal-cheapest-label strong { font-weight: 800; }
+
+.cal-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.45rem 1.1rem;
+  background: #f8faff;
+  border-bottom: 1px solid #eef2ff;
+  font-size: 0.72rem;
+  color: #666;
+}
+
+.cal-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.cal-dot.cal-cheap     { background: #bbf7d0; }
+.cal-dot.cal-mid       { background: #fef08a; }
+.cal-dot.cal-expensive { background: #fecaca; }
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  padding: 0.5rem;
+  background: #f0f4ff;
+}
+
+.cal-day-name {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #94a3b8;
+  padding: 4px 0;
+  background: #fff;
+}
+
+.cal-cell {
+  background: #fff;
+  border-radius: 6px;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.cal-empty, .cal-no-data {
+  background: #f8faff;
+  color: #cbd5e1;
+  font-size: 0.75rem;
+}
+
+.cal-has-price {
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  padding: 4px 2px;
+}
+.cal-has-price:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  z-index: 1;
+}
+
+.cal-cheap     { background: #f0fdf4; border: 1px solid #bbf7d0; }
+.cal-mid       { background: #fefce8; border: 1px solid #fef08a; }
+.cal-expensive { background: #fff1f2; border: 1px solid #fecaca; }
+
+.cal-day-num {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.cal-price {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-top: 2px;
+  line-height: 1;
+}
+
+.cal-cheap .cal-price     { color: #15803d; }
+.cal-mid .cal-price       { color: #854d0e; }
+.cal-expensive .cal-price { color: #be123c; }
+
+.cal-direct-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #1a6cf0;
+  margin-top: 3px;
+}
