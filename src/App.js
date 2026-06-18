@@ -360,7 +360,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
 
 function AppRouter() {
   const { token } = useAuth();
-  const [page, setPage] = useState('landing');
+  const [page, setPage] = useState(() => token ? 'app' : 'landing');
   const [initialQuery, setInitialQuery] = useState('');
 
   useEffect(() => {
