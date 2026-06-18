@@ -20,15 +20,21 @@ export default function CalendarView({ from, to, month, days }) {
   const [year, mon] = month.split('-').map(Number);
   const monthName = MONTH_NAMES[mon - 1];
 
-  // Build lookup: normalize to YYYY-MM-DD in case API includes time component
+  // Normalize date to YYYY-MM-DD: handles missing zero-padding ("2026-7-21") and time components
+  function normalizeDate(raw) {
+    if (!raw) return '';
+    const m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+    return raw.substring(0, 10);
+  }
+
   const dayMap = {};
-  days.forEach(d => {
-    const key = (d.date || '').substring(0, 10);
-    if (key) dayMap[key] = { ...d, date: key };
-  });
+  const normalizedDays = days.map(d => ({ ...d, date: normalizeDate(d.date) }));
+  normalizedDays.forEach(d => { if (d.date) dayMap[d.date] = d; });
+  const cheapest = normalizedDays.reduce((a, b) => a.price < b.price ? a : b, normalizedDays[0]);
 
   // Price range for color coding
-  const prices = days.map(d => d.price);
+  const prices = normalizedDays.map(d => d.price);
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   const range = maxPrice - minPrice || 1;
@@ -46,8 +52,6 @@ export default function CalendarView({ from, to, month, days }) {
   const cells = [];
   for (let i = 0; i < firstDay; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-
-  const cheapest = days.reduce((a, b) => a.price < b.price ? a : b, days[0]);
 
   return (
     <div className="cal-wrapper">
