@@ -6,6 +6,17 @@ import Logo from './components/Logo';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 
+function formatExpiry(expiresAt) {
+  if (!expiresAt) return null;
+  const diff = new Date(expiresAt) - Date.now();
+  if (diff <= 0) return null;
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  if (h >= 24) return null; // not useful to show "expires in 3 days"
+  if (h > 0) return `⏳ ${h}h ${m}m left`;
+  return `⏳ ${m}m left`;
+}
+
 const DEAL_GRADIENTS = [
   'linear-gradient(135deg, #1a6cf0 0%, #7c3aed 100%)',
   'linear-gradient(135deg, #0891b2 0%, #1a6cf0 100%)',
@@ -143,6 +154,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
                     {d.dealScore === 'amazing' && <span className="badge-score amazing">🔥 Amazing</span>}
                     {d.dealScore === 'good'    && <span className="badge-score good">✅ Good Deal</span>}
                     {d.isVisaFree             && <span className="badge-visa">🟢 Visa Free for Indians</span>}
+                    {formatExpiry(d.expiresAt) && <span className="badge-expiry">{formatExpiry(d.expiresAt)}</span>}
                   </div>
                   <div className="deal-cta">Book Now ↗</div>
                 </div>
