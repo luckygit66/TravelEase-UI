@@ -188,8 +188,8 @@ function MainApp({ onGoHome, initialQuery = '' }) {
       removeTyping();
 
       if (parseRes.status === 401) {
-        pushMsg({ role: 'ai', text: 'Your session expired. Please sign in again.' });
-        setLoading(false); return;
+        logout();
+        return;
       }
       if (!parseRes.ok) {
         pushMsg({ role: 'ai', text: "I couldn't understand that. Try: \"Flights from Delhi to Mumbai on 28 June\"" });
