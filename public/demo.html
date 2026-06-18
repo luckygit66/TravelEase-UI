@@ -289,6 +289,8 @@
     ? 'http://localhost:5055/api'
     : 'https://travelease-api-production.up.railway.app/api';
   var MARKER = '437825';
+  var CURRENCY = 'aed';
+  var CURRENCY_SYMBOL = 'AED ';
 
   var token = null;
   var hist = [];
@@ -381,7 +383,7 @@
       if (intent !== 'calendar' && !from && to) { from = to; to = null; intent = 'explore'; }
 
       if (intent === 'explore' && from) {
-        var url = API + '/FlightAggregator/explore?from=' + from;
+        var url = API + '/FlightAggregator/explore?from=' + from + '&currency=' + CURRENCY;
         if (p.maxBudget) url += '&maxBudget=' + p.maxBudget;
         if (month) url += '&month=' + month;
         if (p.visaFree) url += '&visaFree=true';
@@ -396,7 +398,7 @@
 
       } else if (intent === 'calendar' && from && to) {
         if (!/^\d{4}-\d{2}$/.test(month)) month = new Date().toISOString().slice(0, 7);
-        var cr = await fetch(API + '/FlightAggregator/calendar?from=' + from + '&to=' + to + '&month=' + month, {
+        var cr = await fetch(API + '/FlightAggregator/calendar?from=' + from + '&to=' + to + '&month=' + month + '&currency=' + CURRENCY, {
           headers: { Authorization: 'Bearer ' + token }
         });
         var days = await cr.json();
@@ -491,7 +493,7 @@
           badges +
         '</div>' +
         '<div class="wcard-r">' +
-          '<div class="wc-price">₹' + Number(d.price).toLocaleString('en-IN') + '</div>' +
+          '<div class="wc-price">' + CURRENCY_SYMBOL + Number(d.price).toLocaleString() + '</div>' +
           '<div class="wc-date">' + esc(d.date) + '</div>' +
           '<a href="' + url + '" target="_blank" class="wbtn">Book Now</a>' +
         '</div>';
@@ -519,7 +521,7 @@
   function calendarCards(days, from, to, month) {
     var top5 = days.slice().sort(function (a, b) { return a.price - b.price; }).slice(0, 5);
     var cheapest = top5[0];
-    aiMsg('📅 ' + from + ' → ' + to + ' · ' + month + '\nCheapest: ₹' + Number(cheapest.price).toLocaleString('en-IN') + ' on ' + cheapest.date);
+    aiMsg('📅 ' + from + ' → ' + to + ' · ' + month + '\nCheapest: ' + CURRENCY_SYMBOL + Number(cheapest.price).toLocaleString() + ' on ' + cheapest.date);
     var m = document.getElementById('wm');
     var wrap = document.createElement('div');
     wrap.className = 'wmsg ai';
@@ -534,7 +536,7 @@
           '<div class="wc-meta">' + esc(stopLabel) + ' · ' + esc(d.airline) + '</div>' +
         '</div>' +
         '<div class="wcard-r">' +
-          '<div class="wc-price">₹' + Number(d.price).toLocaleString('en-IN') + '</div>' +
+          '<div class="wc-price">' + CURRENCY_SYMBOL + Number(d.price).toLocaleString() + '</div>' +
           '<a href="' + url + '" target="_blank" class="wbtn">Book</a>' +
         '</div>';
       wrap.appendChild(card);
