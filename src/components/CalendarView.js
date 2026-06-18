@@ -33,6 +33,9 @@ export default function CalendarView({ from, to, month, days }) {
   normalizedDays.forEach(d => { if (d.date) dayMap[d.date] = d; });
   const cheapest = normalizedDays.reduce((a, b) => a.price < b.price ? a : b, normalizedDays[0]);
 
+  // DEBUG — remove after fix confirmed
+  console.log('[Calendar] raw day[0]:', days[0], '| normalized:', normalizedDays[0], '| dayMap keys:', Object.keys(dayMap).slice(0, 5));
+
   // Price range for color coding
   const prices = normalizedDays.map(d => d.price);
   const minPrice = Math.min(...prices);
