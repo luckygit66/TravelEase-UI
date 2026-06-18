@@ -5,6 +5,12 @@ const MONTH_NAMES = ['January','February','March','April','May','June',
                      'July','August','September','October','November','December'];
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+function getOrdinal(n) {
+  const v = n % 100;
+  const s = ['th', 'st', 'nd', 'rd'];
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 function buildAviasalesUrl(from, to, date) {
   const [, m, d] = date.split('-');
   return `https://www.aviasales.com/search/${from}${d}${m}${to}1?marker=437825`;
@@ -49,7 +55,7 @@ export default function CalendarView({ from, to, month, days }) {
         <span className="cal-title">{from} → {to} · {monthName} {year}</span>
         {cheapest && (
           <span className="cal-cheapest-label">
-            Cheapest: <strong>₹{cheapest.price.toLocaleString('en-IN')}</strong> on {cheapest.date.slice(8)}th
+            Cheapest: <strong>₹{cheapest.price.toLocaleString('en-IN')}</strong> on {getOrdinal(parseInt(cheapest.date.slice(8), 10))}
           </span>
         )}
       </div>
