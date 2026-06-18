@@ -126,7 +126,9 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
           </h2>
           <p className="lp-deals-subtitle">Live prices updated every morning from top Indian cities</p>
           <div className="deals-grid">
-            {deals.map((d, i) => (
+            {deals.map((d, i) => {
+              const expiry = formatExpiry(d.expiresAt);
+              return (
               <a
                 key={d.origin + d.destination}
                 href={d.bookUrl}
@@ -154,12 +156,13 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
                     {d.dealScore === 'amazing' && <span className="badge-score amazing">🔥 Amazing</span>}
                     {d.dealScore === 'good'    && <span className="badge-score good">✅ Good Deal</span>}
                     {d.isVisaFree             && <span className="badge-visa">🟢 Visa Free for Indians</span>}
-                    {formatExpiry(d.expiresAt) && <span className="badge-expiry">{formatExpiry(d.expiresAt)}</span>}
+                    {expiry && <span className="badge-expiry">{expiry}</span>}
                   </div>
                   <div className="deal-cta">Book Now ↗</div>
                 </div>
               </a>
-            ))}
+              );
+            })}
           </div>
           <div className="deals-telegram-cta">
             <span>Get these deals every morning for free</span>

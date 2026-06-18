@@ -188,6 +188,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
       removeTyping();
 
       if (parseRes.status === 401) {
+        setLoading(false);
         logout();
         return;
       }
@@ -361,14 +362,29 @@ function MainApp({ onGoHome, initialQuery = '' }) {
   );
 }
 
+function isTokenExpired(token) {
+  try {
+    const { exp } = JSON.parse(atob(token.split('.')[1]));
+    return exp * 1000 < Date.now();
+  } catch { return true; }
+}
+
 function AppRouter() {
-  const { token } = useAuth();
-  const [page, setPage] = useState(() => token ? 'app' : 'landing');
+  const { token, logout } = useAuth();
+  const [page, setPage] = useState(() => {
+    if (!token) return 'landing';
+    if (isTokenExpired(token)) return 'login';
+    return 'app';
+  });
   const [initialQuery, setInitialQuery] = useState('');
 
   useEffect(() => {
     if (!token && page === 'app') setPage('login');
   }, [token, page]);
+
+  useEffect(() => {
+    if (token && isTokenExpired(token)) { logout(); setPage('login'); }
+  }, [token, logout]);
 
   const goToApp = (query = '') => {
     setInitialQuery(query || '');
