@@ -14,9 +14,12 @@ export default function CalendarView({ from, to, month, days }) {
   const [year, mon] = month.split('-').map(Number);
   const monthName = MONTH_NAMES[mon - 1];
 
-  // Build lookup: date string → day data
+  // Build lookup: normalize to YYYY-MM-DD in case API includes time component
   const dayMap = {};
-  days.forEach(d => { dayMap[d.date] = d; });
+  days.forEach(d => {
+    const key = (d.date || '').substring(0, 10);
+    if (key) dayMap[key] = { ...d, date: key };
+  });
 
   // Price range for color coding
   const prices = days.map(d => d.price);
