@@ -11,8 +11,20 @@ function getOrdinal(n) {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-function buildAviasalesUrl(from, to, date) {
-  const [, m, d] = date.split('-');
+// Extract day-of-month from any reasonable date string format — format-independent
+function extractDayNumber(raw) {
+  if (!raw) return null;
+  // YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD  →  last segment
+  let m = raw.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+  if (m) return parseInt(m[3], 10);
+  // DD-MM-YYYY, DD/MM/YYYY  →  first segment
+  m = raw.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+  if (m) return parseInt(m[1], 10);
+  return null;
+}
+
+function buildAviasalesUrl(from, to, dateStr) {
+  const [, m, d] = dateStr.split('-');
   return `https://www.aviasales.com/search/${from}${d}${m}${to}1?marker=437825`;
 }
 
@@ -20,24 +32,14 @@ export default function CalendarView({ from, to, month, days }) {
   const [year, mon] = month.split('-').map(Number);
   const monthName = MONTH_NAMES[mon - 1];
 
-  // Normalize date to YYYY-MM-DD: handles missing zero-padding ("2026-7-21") and time components
-  function normalizeDate(raw) {
-    if (!raw) return '';
-    const m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-    if (m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
-    return raw.substring(0, 10);
-  }
-
+  // Key by day number — completely format-independent
   const dayMap = {};
-  const normalizedDays = days.map(d => ({ ...d, date: normalizeDate(d.date) }));
-  normalizedDays.forEach(d => { if (d.date) dayMap[d.date] = d; });
-  const cheapest = normalizedDays.reduce((a, b) => a.price < b.price ? a : b, normalizedDays[0]);
+  days.forEach(d => {
+    const n = extractDayNumber(d.date);
+    if (n && n >= 1 && n <= 31) dayMap[n] = d;
+  });
 
-  // DEBUG — remove after fix confirmed
-  console.log('[Calendar] raw day[0]:', days[0], '| normalized:', normalizedDays[0], '| dayMap keys:', Object.keys(dayMap).slice(0, 5));
-
-  // Price range for color coding
-  const prices = normalizedDays.map(d => d.price);
+  const prices = days.map(d => d.price);
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   const range = maxPrice - minPrice || 1;
@@ -49,8 +51,10 @@ export default function CalendarView({ from, to, month, days }) {
     return 'cal-expensive';
   }
 
-  // Calendar grid: pad to first weekday
-  const firstDay = new Date(year, mon - 1, 1).getDay();
+  const cheapestEntry = days.reduce((a, b) => a.price < b.price ? a : b, days[0]);
+  const cheapestDay   = extractDayNumber(cheapestEntry?.date);
+
+  const firstDay    = new Date(year, mon - 1, 1).getDay();
   const daysInMonth = new Date(year, mon, 0).getDate();
   const cells = [];
   for (let i = 0; i < firstDay; i++) cells.push(null);
@@ -60,9 +64,9 @@ export default function CalendarView({ from, to, month, days }) {
     <div className="cal-wrapper">
       <div className="cal-header">
         <span className="cal-title">{from} → {to} · {monthName} {year}</span>
-        {cheapest && (
+        {cheapestEntry && cheapestDay && (
           <span className="cal-cheapest-label">
-            Cheapest: <strong>₹{cheapest.price.toLocaleString('en-IN')}</strong> on {getOrdinal(parseInt(cheapest.date.slice(8), 10))}
+            Cheapest: <strong>₹{cheapestEntry.price.toLocaleString('en-IN')}</strong> on {getOrdinal(cheapestDay)}
           </span>
         )}
       </div>
@@ -75,8 +79,8 @@ export default function CalendarView({ from, to, month, days }) {
         {DAY_NAMES.map(d => <div key={d} className="cal-day-name">{d}</div>)}
         {cells.map((day, i) => {
           if (!day) return <div key={`e${i}`} className="cal-cell cal-empty" />;
+          const data = dayMap[day];
           const dateStr = `${year}-${String(mon).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-          const data = dayMap[dateStr];
           if (!data) return <div key={dateStr} className="cal-cell cal-no-data">{day}</div>;
           return (
             <a
