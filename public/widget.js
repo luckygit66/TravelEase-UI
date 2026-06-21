@@ -212,7 +212,10 @@
       if (saidFrom && intent === 'explore' && !from && to) { from = to; to = null; }
       if (saidFrom && intent !== 'calendar' && !from && to) { from = to; to = null; intent = 'explore'; }
 
-      if (intent === 'alert' || intent === 'remove_alert' || intent === 'list_alerts') {
+      if (from && to && from.toUpperCase() === to.toUpperCase()) {
+        aiMsg('Origin and destination are the same (' + from + '). Please choose two different cities.');
+
+      } else if (intent === 'alert' || intent === 'remove_alert' || intent === 'list_alerts') {
         aiMsg('🔔 Price alerts are available on our Telegram bot — message @TravelsPalBot (t.me/TravelsPalBot) and ask the same thing there.');
 
       } else if (intent === 'explore' && from) {
