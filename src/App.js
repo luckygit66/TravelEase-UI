@@ -5,83 +5,13 @@ import LandingPage from './LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import './App.css';
-import { FiLogOut, FiClock, FiArrowRight, FiSend } from 'react-icons/fi';
+import { FiLogOut, FiArrowRight, FiSend } from 'react-icons/fi';
 import { exploreDestinations, getPriceCalendar } from './services/flightService';
 import CalendarView from './components/CalendarView';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 
 const TRAVELPAYOUTS_MARKER = '437825';
-
-function buildBookingUrl(flight) {
-  const [, month, day] = (flight.departure?.split(' ')[0] || '').split('-');
-  const pax = flight.passengers || 1;
-  const searchStr = day && month ? `${flight.from}${day}${month}${flight.to}${pax}` : `${flight.from}0101${flight.to}1`;
-  return `https://www.aviasales.com/search/${searchStr}?marker=${TRAVELPAYOUTS_MARKER}`;
-}
-
-
-function formatDuration(mins) {
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return `${h}h ${m}m`;
-}
-
-function FlightCard({ flight, tag }) {
-  return (
-    <div className={`flight-result-card ${tag ? 'cheapest' : ''}`}>
-      {tag === 'best' && <div className="cheapest-tag">Best Price</div>}
-      {tag === 'direct' && <div className="cheapest-tag direct-tag">Cheapest Direct</div>}
-      <div className="fc-left">
-        {flight.airlineLogo
-          ? <img src={flight.airlineLogo} alt={flight.airline} className="fc-logo" onError={e => { e.target.style.display='none'; }} />
-          : <div className="fc-logo-placeholder">{flight.airline?.charAt(0)}</div>
-        }
-        <div className="fc-airline">{flight.airline}</div>
-        <div className="fc-number">{flight.flightNumber}</div>
-      </div>
-      <div className="fc-route">
-        <div className="fc-time-block">
-          <span className="fc-time">{flight.departure}</span>
-          <span className="fc-code">{flight.from}</span>
-        </div>
-        <div className="fc-path">
-          <div className="fc-duration"><FiClock size={11} /> {formatDuration(flight.duration)}</div>
-          <div className="fc-line">
-            <div className="fc-dot" />
-            <div className="fc-dash" />
-            <div className={`fc-stop-label ${flight.stops === 0 ? 'direct' : ''}`}>
-              {flight.stops === 0
-                ? 'Direct'
-                : `${flight.stops} Stop${flight.stopCities?.length ? ` via ${flight.stopCities.join(', ')}` : ''}`}
-            </div>
-            <div className="fc-dash" />
-            <div className="fc-dot" />
-          </div>
-        </div>
-        <div className="fc-time-block right">
-          <span className="fc-time">{flight.arrival}</span>
-          <span className="fc-code">{flight.to}</span>
-        </div>
-      </div>
-      <div className="fc-right">
-        <div className="fc-price">₹{flight.price?.toLocaleString('en-IN')}</div>
-        <div className="fc-per">per person</div>
-        {flight.passengers > 1 && (
-          <div className="fc-total">₹{flight.totalPrice?.toLocaleString('en-IN')} total</div>
-        )}
-        <a
-          href={buildBookingUrl(flight)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fc-book-btn"
-        >
-          Book <FiArrowRight size={13} />
-        </a>
-      </div>
-    </div>
-  );
-}
 
 function buildAviasalesUrl(from, dest, passengers = 1) {
   const [, month, day] = (dest.date || '').split('-');
@@ -323,28 +253,6 @@ function MainApp({ onGoHome, initialQuery = '' }) {
                   <div className="chat-bubble">
                     {msg.text.split('\n').map((line, i) => <span key={i}>{line}<br /></span>)}
                   </div>
-                  {msg.flights?.length > 0 && (
-                    <div className="chat-flights">
-                      <div className="results-header">
-                        <span className="results-count">{msg.flights.length} flights found</span>
-                        <span className="results-sort">Sorted by price</span>
-                      </div>
-                      <div className="flights-list">
-                        {(() => {
-                          const sorted = [...msg.flights].sort((a, b) => (a.price||0) - (b.price||0));
-                          const minPrice = sorted[0]?.price;
-                          const directPrices = msg.flights.filter(f => f.stops === 0 && f.price).map(f => f.price);
-                          const minDirectPrice = directPrices.length > 0 ? Math.min(...directPrices) : null;
-                          return sorted.map((f, i) => {
-                            const isBest = f.price === minPrice;
-                            const isCheapestDirect = !isBest && f.stops === 0 && f.price === minDirectPrice;
-                            const tag = isBest ? 'best' : (isCheapestDirect ? 'direct' : null);
-                            return <FlightCard key={i} flight={f} tag={tag} />;
-                          });
-                        })()}
-                      </div>
-                    </div>
-                  )}
                   {msg.calendarData && (
                     <div className="chat-flights">
                       <CalendarView {...msg.calendarData} />
