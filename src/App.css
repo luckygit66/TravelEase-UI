@@ -158,6 +158,10 @@ body {
   letter-spacing: 0.3px;
 }
 
+.cheapest-tag.direct-tag {
+  background: linear-gradient(90deg, #7c3aed, #a855f7);
+}
+
 /* Left: Airline */
 .fc-left { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 

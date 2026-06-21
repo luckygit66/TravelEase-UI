@@ -27,10 +27,11 @@ function formatDuration(mins) {
   return `${h}h ${m}m`;
 }
 
-function FlightCard({ flight, cheapest }) {
+function FlightCard({ flight, tag }) {
   return (
-    <div className={`flight-result-card ${cheapest ? 'cheapest' : ''}`}>
-      {cheapest && <div className="cheapest-tag">Best Price</div>}
+    <div className={`flight-result-card ${tag ? 'cheapest' : ''}`}>
+      {tag === 'best' && <div className="cheapest-tag">Best Price</div>}
+      {tag === 'direct' && <div className="cheapest-tag direct-tag">Cheapest Direct</div>}
       <div className="fc-left">
         {flight.airlineLogo
           ? <img src={flight.airlineLogo} alt={flight.airline} className="fc-logo" onError={e => { e.target.style.display='none'; }} />
@@ -329,10 +330,18 @@ function MainApp({ onGoHome, initialQuery = '' }) {
                         <span className="results-sort">Sorted by price</span>
                       </div>
                       <div className="flights-list">
-                        {[...msg.flights].sort((a, b) => (a.price||0) - (b.price||0)).map((f, i) => {
-                          const cheapest = f.price === Math.min(...msg.flights.map(x => x.price || Infinity));
-                          return <FlightCard key={i} flight={f} cheapest={cheapest} />;
-                        })}
+                        {(() => {
+                          const sorted = [...msg.flights].sort((a, b) => (a.price||0) - (b.price||0));
+                          const minPrice = sorted[0]?.price;
+                          const directPrices = msg.flights.filter(f => f.stops === 0 && f.price).map(f => f.price);
+                          const minDirectPrice = directPrices.length > 0 ? Math.min(...directPrices) : null;
+                          return sorted.map((f, i) => {
+                            const isBest = f.price === minPrice;
+                            const isCheapestDirect = !isBest && f.stops === 0 && f.price === minDirectPrice;
+                            const tag = isBest ? 'best' : (isCheapestDirect ? 'direct' : null);
+                            return <FlightCard key={i} flight={f} tag={tag} />;
+                          });
+                        })()}
                       </div>
                     </div>
                   )}
