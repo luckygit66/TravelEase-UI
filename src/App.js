@@ -130,14 +130,25 @@ function MainApp({ onGoHome, initialQuery = '' }) {
       }
 
       const p = await parseRes.json();
-      const from = p.from, to = p.to;
+      let from = p.from, to = p.to;
       const date = p.date || new Date().toISOString().split('T')[0];
       const { tripType, passengers } = p;
       const pax = passengers || 1;
 
-      const intent = p.searchIntent || (to ? 'route' : 'explore');
+      let intent = p.searchIntent || (to ? 'route' : 'explore');
 
-      if (intent === 'calendar') {
+      // LLM sometimes swaps from/to (e.g. "Cheapest flights from Mumbai" → to=BOM, from=null).
+      // Only correct this when the user's text actually said "from <city>" — otherwise a genuine
+      // destination-only query ("Flights to Bangkok") should ask for the departure city instead.
+      const saidFrom = /\bfrom\b/i.test(q);
+      if (saidFrom && intent !== 'calendar' && !from && to) {
+        from = to; to = null;
+        if (intent === 'route') intent = 'explore';
+      }
+
+      if (intent === 'alert' || intent === 'remove_alert' || intent === 'list_alerts') {
+        pushMsg({ role: 'ai', text: '🔔 Price alerts are available on our Telegram bot — message @TravelsPalBot (t.me/TravelsPalBot) and ask the same thing there.' });
+      } else if (intent === 'calendar') {
         if (!from || !to) {
           pushMsg({ role: 'ai', text: "Please tell me both origin and destination for the price calendar. Try: \"Cheapest days to fly Delhi to Bangkok in July\"" });
           setLoading(false); return;

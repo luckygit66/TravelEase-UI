@@ -204,11 +204,18 @@
       var rawDate = p.date || new Date().toISOString();
       var month = rawDate.slice(0, 7);
 
-      // LLM sometimes swaps from/to on explore queries (e.g. "from Mumbai" → to=BOM, from=null)
-      if (intent === 'explore' && !from && to) { from = to; to = null; }
-      if (intent !== 'calendar' && !from && to) { from = to; to = null; intent = 'explore'; }
+      // LLM sometimes swaps from/to on explore queries (e.g. "from Mumbai" → to=BOM, from=null).
+      // Only correct this when the user's text actually said "from <city>" — otherwise a genuine
+      // destination-only query ("Flights to Bangkok") would get misread as "explore from Bangkok"
+      // instead of asking the user for their departure city.
+      var saidFrom = /\bfrom\b/i.test(text);
+      if (saidFrom && intent === 'explore' && !from && to) { from = to; to = null; }
+      if (saidFrom && intent !== 'calendar' && !from && to) { from = to; to = null; intent = 'explore'; }
 
-      if (intent === 'explore' && from) {
+      if (intent === 'alert' || intent === 'remove_alert' || intent === 'list_alerts') {
+        aiMsg('🔔 Price alerts are available on our Telegram bot — message @TravelsPalBot (t.me/TravelsPalBot) and ask the same thing there.');
+
+      } else if (intent === 'explore' && from) {
         var url = API + '/FlightAggregator/explore?from=' + from + '&currency=' + config.currency;
         if (p.maxBudget) url += '&maxBudget=' + p.maxBudget;
         if (month) url += '&month=' + month;
