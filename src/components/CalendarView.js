@@ -66,7 +66,7 @@ export default function CalendarView({ from, to, month, days }) {
         <span className="cal-title">{from} → {to} · {monthName} {year}</span>
         {cheapestEntry && cheapestDay && (
           <span className="cal-cheapest-label">
-            Cheapest: <strong>₹{cheapestEntry.price.toLocaleString('en-IN')}</strong> on {getOrdinal(cheapestDay)}
+            🔥 Cheapest: <strong>₹{cheapestEntry.price.toLocaleString('en-IN')}</strong> on {getOrdinal(cheapestDay)}
           </span>
         )}
       </div>
