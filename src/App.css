@@ -258,9 +258,3 @@ body {
   border-top: 1px solid #e8edf5;
   color: #b0bac6; font-size: 0.85rem; margin-top: 2rem;
 }
-
-@media (max-width: 640px) {
-  .flight-result-card { grid-template-columns: 1fr; }
-  .fc-right { align-items: flex-start; }
-  .fc-book-btn { width: 100%; justify-content: center; }
-}
