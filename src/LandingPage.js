@@ -87,6 +87,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
       </nav>
 
       <section className="lp-hero">
+        <div className="lp-hero-badge">🤖 AI-powered flight search — just type what you want</div>
         <h1>Find Flights That Fit <span>Your Budget</span></h1>
         <p>Just describe your trip — AI will handle the rest</p>
 
