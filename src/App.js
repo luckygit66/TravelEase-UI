@@ -208,12 +208,30 @@ function MainApp({ onGoHome, initialQuery = '' }) {
           const month = date ? date.slice(0, 7) : null;
           const destinations = await exploreDestinations(from, token, { to, month, maxBudget: p.maxBudget, visaFree: p.visaFree });
           if (destinations?.length > 0) {
+            let shown = destinations;
+            let exactNote = '';
+
+            // exploreDestinations only ever returns the cheapest price in the whole
+            // month — if the user asked for a specific day, check the calendar for
+            // that exact day instead of silently showing a different date's price.
+            if (p.hasSpecificDay && month) {
+              try {
+                const days = await getPriceCalendar(from, to, month, token);
+                const exactDay = days?.find(d => d.date === date);
+                if (exactDay) {
+                  shown = [{ ...destinations[0], price: exactDay.price, date: exactDay.date, airline: exactDay.airline, stops: exactDay.stops }];
+                } else {
+                  exactNote = ` (no exact price for ${date} — showing cheapest in ${month} instead)`;
+                }
+              } catch { /* keep month-cheapest result if calendar lookup fails */ }
+            }
+
             const tripLabel = tripType === 'roundtrip' ? ' · Round trip' : '';
             const paxInfo   = pax > 1 ? ` · ${pax} passengers` : '';
             pushMsg({
               role: 'ai',
-              text: `Best prices found · ${from} → ${to}${month ? ` · ${month}` : ''}${tripLabel}${paxInfo}`,
-              destinations,
+              text: `Best prices found · ${from} → ${to}${month ? ` · ${month}` : ''}${tripLabel}${paxInfo}${exactNote}`,
+              destinations: shown,
               from,
             });
           } else {
