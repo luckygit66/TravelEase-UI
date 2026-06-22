@@ -4,6 +4,7 @@ import Logo from './components/Logo';
 import LandingPage from './LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import AgencySignupPage from './pages/AgencySignupPage';
 import './App.css';
 import { FiLogOut, FiArrowRight, FiSend } from 'react-icons/fi';
 import { exploreDestinations, getPriceCalendar } from './services/flightService';
@@ -328,6 +329,7 @@ function isTokenExpired(token) {
 function AppRouter() {
   const { token, logout } = useAuth();
   const [page, setPage] = useState(() => {
+    if (window.location.pathname === '/agencies') return 'agency-signup';
     if (!token) return 'landing';
     if (isTokenExpired(token)) return 'login';
     return 'app';
@@ -354,6 +356,7 @@ function AppRouter() {
 
   if (page === 'login') return <LoginPage onSuccess={() => goToApp(initialQuery)} onGoRegister={() => setPage('register')} onGoHome={() => setPage('landing')} />;
   if (page === 'register') return <RegisterPage onSuccess={() => goToApp(initialQuery)} onGoLogin={() => setPage('login')} onGoHome={() => setPage('landing')} />;
+  if (page === 'agency-signup') return <AgencySignupPage onGoHome={() => setPage('landing')} />;
   if (page === 'app') return <MainApp onGoHome={() => setPage('landing')} initialQuery={initialQuery} />;
 
   return (
