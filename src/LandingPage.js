@@ -97,7 +97,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder='e.g. "Flights from Delhi to Bangkok next week under ₹20,000"'
+                placeholder='e.g. "Flights from Delhi to Bangkok next week under $300"'
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}

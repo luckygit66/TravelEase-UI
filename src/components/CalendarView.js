@@ -66,7 +66,7 @@ export default function CalendarView({ from, to, month, days }) {
         <span className="cal-title">{from} → {to} · {monthName} {year}</span>
         {cheapestEntry && cheapestDay && (
           <span className="cal-cheapest-label">
-            🔥 Cheapest: <strong>₹{cheapestEntry.price.toLocaleString('en-IN')}</strong> on {getOrdinal(cheapestDay)}
+            🔥 Cheapest: <strong>${cheapestEntry.price.toLocaleString('en-US')}</strong> on {getOrdinal(cheapestDay)}
           </span>
         )}
       </div>
@@ -91,7 +91,7 @@ export default function CalendarView({ from, to, month, days }) {
               className={`cal-cell cal-has-price ${priceClass(data.price)}`}
             >
               <span className="cal-day-num">{day}</span>
-              <span className="cal-price">₹{(data.price / 1000).toFixed(1)}k</span>
+              <span className="cal-price">${(data.price / 1000).toFixed(1)}k</span>
               {data.stops === 0 && <span className="cal-direct-dot" title="Direct" />}
             </a>
           );

@@ -59,7 +59,7 @@ function DestinationCard({ dest, from, onSearch }) {
         <div className="drc-meta">{dest.stops === 0 ? 'Direct' : `${dest.stops} stop`} · {dest.airline}</div>
       </div>
       <div className="drc-right">
-        <div className="drc-price">from ₹{dest.price.toLocaleString('en-IN')}</div>
+        <div className="drc-price">from ${dest.price.toLocaleString('en-US')}</div>
         <div className="drc-date">{dest.date}</div>
         <a
           href={buildAviasalesUrl(from, dest)}
@@ -179,7 +179,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
           const month = date ? date.slice(0, 7) : null;
           const destinations = await exploreDestinations(from, token, { month, maxBudget: p.maxBudget, visaFree: p.visaFree });
           if (destinations?.length > 0) {
-            const budgetInfo = p.maxBudget ? ` under ₹${p.maxBudget.toLocaleString('en-IN')}` : '';
+            const budgetInfo = p.maxBudget ? ` under $${p.maxBudget.toLocaleString('en-US')}` : '';
             const monthInfo  = month ? ` in ${month}` : '';
             const visaInfo   = p.visaFree ? ' (visa-free for Indians)' : '';
             pushMsg({
