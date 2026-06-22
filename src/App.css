@@ -8,28 +8,30 @@ body {
 
 /* ── Navbar ── */
 .app-nav {
-  background: #fff;
-  border-bottom: 1px solid #e8edf5;
+  background: linear-gradient(135deg, #0f2147 0%, #1a3a73 100%);
+  border-bottom: none;
   padding: 0.85rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 14px rgba(15,33,71,0.25);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
+.app-nav .logo-travel { color: rgba(255,255,255,0.75); }
+
 .app-nav-right { display: flex; align-items: center; gap: 1rem; }
-.app-nav-user { font-size: 0.88rem; color: #555; font-weight: 500; }
+.app-nav-user { font-size: 0.88rem; color: rgba(255,255,255,0.8); font-weight: 500; }
 .app-nav-logout {
   display: flex; align-items: center;
-  background: none; border: 1.5px solid #e0e0e0;
-  color: #666; padding: 0.38rem 0.9rem;
+  background: none; border: 1.5px solid rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.85); padding: 0.38rem 0.9rem;
   border-radius: 8px; font-size: 0.85rem; font-weight: 500;
   cursor: pointer; transition: all 0.2s; margin: 0; transform: none !important;
 }
-.app-nav-logout:hover { border-color: #4f46e5; color: #4f46e5; background: #f5f3ff; transform: none !important; }
+.app-nav-logout:hover { border-color: #f4a92a; color: #f4a92a; background: rgba(244,169,42,0.12); transform: none !important; }
 
 /* ── Page ── */
 .app-page { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
@@ -135,7 +137,7 @@ body {
 
 .chat-avatar {
   width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-  background: linear-gradient(135deg, #4f46e5, #0284c7);
+  background: linear-gradient(135deg, #0f2147, #1a3a73);
   display: flex; align-items: center; justify-content: center;
   font-size: 1rem;
 }
@@ -203,7 +205,7 @@ body {
 }
 .drc-code {
   font-size: 1.2rem; font-weight: 800;
-  color: #4f46e5; letter-spacing: 1px;
+  color: #1a3a73; letter-spacing: 1px;
 }
 .drc-city { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; }
 .drc-country { font-size: 0.78rem; color: #94a3b8; }
@@ -213,9 +215,9 @@ body {
 .drc-date { font-size: 0.75rem; color: #94a3b8; }
 .drc-btn {
   display: flex; align-items: center; gap: 5px;
-  background: linear-gradient(135deg, #4f46e5, #0284c7);
-  color: #fff; border: none; border-radius: 8px;
-  padding: 0.45rem 0.85rem; font-size: 0.82rem; font-weight: 600;
+  background: linear-gradient(135deg, #f4a92a, #e0981a);
+  color: #1a2b4a; border: none; border-radius: 8px;
+  padding: 0.45rem 0.85rem; font-size: 0.82rem; font-weight: 700;
   cursor: pointer; transition: opacity 0.2s; margin-top: 4px;
 }
 .drc-btn:hover { opacity: 0.88; }
@@ -243,7 +245,7 @@ body {
 }
 .chat-input-wrap input::placeholder { color: #b0bac6; }
 .chat-send-btn {
-  background: linear-gradient(135deg, #4f46e5, #0284c7);
+  background: linear-gradient(135deg, #0f2147, #1a3a73);
   color: #fff; border: none; border-radius: 8px;
   width: 36px; height: 36px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
