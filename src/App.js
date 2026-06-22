@@ -5,6 +5,7 @@ import LandingPage from './LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AgencySignupPage from './pages/AgencySignupPage';
+import AuthGateModal from './components/AuthGateModal';
 import './App.css';
 import { FiLogOut, FiArrowRight, FiSend } from 'react-icons/fi';
 import { exploreDestinations, getPriceCalendar } from './services/flightService';
@@ -378,11 +379,14 @@ function AppRouter() {
   if (page === 'app') return <MainApp onGoHome={() => setPage('landing')} initialQuery={initialQuery} />;
 
   return (
-    <LandingPage
-      onGetStarted={handleGetStarted}
-      onGoLogin={() => setPage('login')}
-      onGoRegister={() => setPage('register')}
-    />
+    <>
+      <LandingPage
+        onGetStarted={handleGetStarted}
+        onGoLogin={() => setPage('login')}
+        onGoRegister={() => setPage('register')}
+      />
+      {!token && <AuthGateModal onSuccess={() => goToApp(initialQuery)} />}
+    </>
   );
 }
 
