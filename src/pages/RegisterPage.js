@@ -40,7 +40,7 @@ function RegisterPage({ onSuccess, onGoLogin, onGoHome }) {
                 type="text"
                 value={form.firstName}
                 onChange={set('firstName')}
-                placeholder="Ali"
+                placeholder="Raj"
                 required
               />
             </div>
@@ -50,7 +50,7 @@ function RegisterPage({ onSuccess, onGoLogin, onGoHome }) {
                 type="text"
                 value={form.lastName}
                 onChange={set('lastName')}
-                placeholder="Khan"
+                placeholder="Sharma"
                 required
               />
             </div>
