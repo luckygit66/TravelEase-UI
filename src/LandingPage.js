@@ -125,7 +125,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
             <img src="/logo.svg" alt="" width="32" height="32" style={{ verticalAlign: 'middle', marginRight: '0.5rem' }} />
             Today's Flight Deals
           </h2>
-          <p className="lp-deals-subtitle">Live prices updated every morning from top Indian cities</p>
+          <p className="lp-deals-subtitle">Hand-picked deals updated every morning from top Indian cities</p>
           <div className="deals-grid">
             {deals.map((d, i) => {
               const expiry = formatExpiry(d.expiresAt);
@@ -146,7 +146,6 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
                   <div className="deal-country">{d.country}</div>
                 </div>
                 <div className="deal-card-body">
-                  <div className="deal-price">₹{d.price.toLocaleString('en-IN')}</div>
                   <div className="deal-meta">
                     <span className={`deal-stops ${d.stops === 0 ? 'direct' : ''}`}>
                       {d.stops === 0 ? 'Direct' : `${d.stops} stop`}
@@ -159,7 +158,7 @@ function LandingPage({ onGetStarted, onGoLogin, onGoRegister }) {
                     {d.isVisaFree             && <span className="badge-visa">🟢 Visa Free for Indians</span>}
                     {expiry && <span className="badge-expiry">{expiry}</span>}
                   </div>
-                  <div className="deal-cta">Book Now ↗</div>
+                  <div className="deal-cta">Check Live Price ↗</div>
                 </div>
               </a>
               );

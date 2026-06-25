@@ -453,13 +453,6 @@
   flex: 1;
 }
 
-.deal-price {
-  font-size: 1.65rem;
-  font-weight: 800;
-  color: #1a1a2e;
-  line-height: 1;
-}
-
 .deal-meta {
   display: flex;
   gap: 0.5rem;

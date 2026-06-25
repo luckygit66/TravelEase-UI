@@ -44,7 +44,7 @@ function RouteSearchCard({ from, to, date, pax }) {
           rel="noopener noreferrer"
           className="drc-btn"
         >
-          Search Flights <FiArrowRight size={12} />
+          Check Live Price <FiArrowRight size={12} />
         </a>
       </div>
     </div>
@@ -59,9 +59,11 @@ function DestinationCard({ dest, from, onSearch }) {
         <div className="drc-city">{dest.city}</div>
         <div className="drc-country">{dest.country}</div>
         <div className="drc-meta">{dest.stops === 0 ? 'Direct' : `${dest.stops} stop`} · {dest.airline}</div>
+        {dest.dealScore === 'amazing' && <div className="drc-badge drc-badge-deal">🔥 Amazing deal</div>}
+        {dest.dealScore === 'good' && <div className="drc-badge drc-badge-deal">✅ Good deal</div>}
+        {dest.isVisaFree && <div className="drc-badge drc-badge-visa">🟢 Visa Free</div>}
       </div>
       <div className="drc-right">
-        <div className="drc-price">from ${dest.price.toLocaleString('en-US')}</div>
         <div className="drc-date">{dest.date}</div>
         <a
           href={buildAviasalesUrl(from, dest)}
@@ -69,7 +71,7 @@ function DestinationCard({ dest, from, onSearch }) {
           rel="noopener noreferrer"
           className="drc-btn"
         >
-          Book Now <FiArrowRight size={12} />
+          Check Live Price <FiArrowRight size={12} />
         </a>
       </div>
     </div>
@@ -152,7 +154,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
         pushMsg({ role: 'ai', text: '🔔 Price alerts are available on our Telegram bot — message @TravelsPalBot (t.me/TravelsPalBot) and ask the same thing there.' });
       } else if (intent === 'calendar') {
         if (!from || !to) {
-          pushMsg({ role: 'ai', text: "Please tell me both origin and destination for the price calendar. Try: \"Cheapest days to fly Delhi to Bangkok in July\"" });
+          pushMsg({ role: 'ai', text: "Please tell me both origin and destination for the calendar. Try: \"Cheapest days to fly Delhi to Bangkok in July\"" });
           setLoading(false); return;
         }
         // Ensure YYYY-MM format — LLM sometimes returns non-standard date strings
@@ -163,14 +165,14 @@ function MainApp({ onGoHome, initialQuery = '' }) {
           if (days?.length > 0) {
             pushMsg({
               role: 'ai',
-              text: `Price calendar for ${from} → ${to} in ${month}. Click any date to book on Aviasales:`,
+              text: `Best days to fly ${from} → ${to} in ${month}. Click any date to check the live price on Aviasales:`,
               calendarData: { from, to, month, days },
             });
           } else {
             pushMsg({ role: 'ai', text: `No calendar data found for ${from} → ${to} in ${month}. Try a different month.` });
           }
         } catch (e) {
-          pushMsg({ role: 'ai', text: `Couldn't load price calendar: ${e.message}` });
+          pushMsg({ role: 'ai', text: `Couldn't load the calendar: ${e.message}` });
         }
       } else if (intent === 'explore') {
         if (!from) {
@@ -186,7 +188,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
             const visaInfo   = p.visaFree ? ' (visa-free for Indians)' : '';
             pushMsg({
               role: 'ai',
-              text: `Here are the cheapest destinations from ${from}${monthInfo}${budgetInfo}${visaInfo}. Click any to search flights:`,
+              text: `Here are the cheapest destinations from ${from}${monthInfo}${budgetInfo}${visaInfo}. Click any to check the live price:`,
               destinations,
               from,
             });
@@ -222,7 +224,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
                 if (exactDay) {
                   shown = [{ ...destinations[0], price: exactDay.price, date: exactDay.date, airline: exactDay.airline, stops: exactDay.stops }];
                 } else {
-                  exactNote = ` (no exact price for ${date} — showing cheapest in ${month} instead)`;
+                  exactNote = ` (no match for ${date} — showing the best alternative day in ${month})`;
                 }
               } catch { /* keep month-cheapest result if calendar lookup fails */ }
             }
@@ -231,7 +233,7 @@ function MainApp({ onGoHome, initialQuery = '' }) {
             const paxInfo   = pax > 1 ? ` · ${pax} passengers` : '';
             pushMsg({
               role: 'ai',
-              text: `Best prices found · ${from} → ${to}${month ? ` · ${month}` : ''}${tripLabel}${paxInfo}${exactNote}`,
+              text: `Best options found · ${from} → ${to}${month ? ` · ${month}` : ''}${tripLabel}${paxInfo}${exactNote}`,
               destinations: shown,
               from,
             });

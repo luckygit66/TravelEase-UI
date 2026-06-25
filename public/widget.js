@@ -15,16 +15,12 @@
     return;
   }
 
-  var CURRENCY_SYMBOLS = { inr: '₹', usd: '$', gbp: '£', aed: 'AED ', eur: '€', sgd: 'S$', aud: 'A$', cad: 'C$' };
-
   var config = { name: 'TravelsPal', currency: 'inr', brandColor: '#1a2b4a', affiliateMarker: '437825' };
   var token = null;
   var hist = [];
   var busy = false;
   var chipsGone = false;
   var opened = false;
-
-  function currencySymbol() { return CURRENCY_SYMBOLS[config.currency] || config.currency.toUpperCase() + ' '; }
 
   // ───────────────────────── styles ─────────────────────────
   function injectStyles() {
@@ -59,7 +55,6 @@
       '.tp-wc-city{font-size:12px;color:#555;margin-top:1px;}' +
       '.tp-wc-meta{font-size:11px;color:#999;margin-top:3px;}' +
       '.tp-wcard-r{text-align:right;flex-shrink:0;}' +
-      '.tp-wc-price{font-weight:800;font-size:15px;color:var(--tp-brand);}' +
       '.tp-wbtn{display:inline-block;background:var(--tp-brand);color:#fff;text-decoration:none;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;margin-top:7px;white-space:nowrap;}' +
       '.tp-wdeal{display:inline-block;background:#fff3e0;color:#e65100;font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;margin-top:4px;}' +
       '.tp-wvisa{display:inline-block;background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;margin-top:4px;margin-left:4px;}' +
@@ -248,7 +243,7 @@
         var isRound = p.tripType === 'roundtrip' && p.returnDate;
         var bookUrl = aviasalesUrl(from, to, p.date || '', isRound ? p.returnDate : null);
         var tripLabel = isRound ? 'Round Trip' : 'One Way';
-        aiMsg('Best fares for ' + from + ' → ' + to + ' (' + tripLabel + '):');
+        aiMsg(from + ' → ' + to + ' (' + tripLabel + '):');
         routeCard(from, to, p.date || '', bookUrl, isRound ? p.returnDate : null);
 
       } else {
@@ -332,9 +327,8 @@
           badges +
         '</div>' +
         '<div class="tp-wcard-r">' +
-          '<div class="tp-wc-price">' + currencySymbol() + Number(d.price).toLocaleString() + '</div>' +
           '<div class="tp-wc-meta">' + esc(d.date) + '</div>' +
-          '<a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Book Now</a>' +
+          '<a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Check Live Price</a>' +
         '</div>';
       wrap.appendChild(card);
     });
@@ -354,15 +348,17 @@
           '<div class="tp-wc-city">Live prices on Aviasales</div>' +
           (meta ? '<div class="tp-wc-meta">' + meta + '</div>' : '') +
         '</div>' +
-        '<div class="tp-wcard-r"><a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Search Flights</a></div>' +
+        '<div class="tp-wcard-r"><a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Check Live Price</a></div>' +
       '</div>';
     m.appendChild(el); scrollBot();
   }
 
   function calendarCards(days, from, to, month) {
+    // Still rank internally by price to surface the best days first — just don't display
+    // the number itself, since it can drift noticeably from TravelPayouts' live price.
     var top5 = days.slice().sort(function (a, b) { return a.price - b.price; }).slice(0, 5);
     var cheapest = top5[0];
-    aiMsg('📅 ' + from + ' → ' + to + ' · ' + month + '\nCheapest: ' + currencySymbol() + Number(cheapest.price).toLocaleString() + ' on ' + cheapest.date);
+    aiMsg('📅 ' + from + ' → ' + to + ' · ' + month + '\n🔥 Best day to fly: ' + cheapest.date);
     var m = document.getElementById('tp-wm');
     var wrap = document.createElement('div');
     wrap.className = 'tp-wmsg ai';
@@ -377,8 +373,7 @@
           '<div class="tp-wc-meta">' + esc(stopLabel) + ' · ' + esc(d.airline) + '</div>' +
         '</div>' +
         '<div class="tp-wcard-r">' +
-          '<div class="tp-wc-price">' + currencySymbol() + Number(d.price).toLocaleString() + '</div>' +
-          '<a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Book</a>' +
+          '<a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Check Live Price</a>' +
         '</div>';
       wrap.appendChild(card);
     });

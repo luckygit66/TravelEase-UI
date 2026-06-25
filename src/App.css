@@ -214,8 +214,10 @@ body {
 .drc-city { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; }
 .drc-country { font-size: 0.78rem; color: #94a3b8; }
 .drc-meta { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+.drc-badge { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin-top: 4px; margin-right: 4px; }
+.drc-badge-deal { background: #fff3e0; color: #e65100; }
+.drc-badge-visa { background: #e8f5e9; color: #2e7d32; }
 .drc-right { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
-.drc-price { font-size: 1.1rem; font-weight: 800; color: #1a1a2e; }
 .drc-date { font-size: 0.75rem; color: #94a3b8; }
 .drc-btn {
   display: flex; align-items: center; gap: 5px;
