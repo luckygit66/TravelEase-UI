@@ -33,6 +33,14 @@ body {
 }
 .app-nav-logout:hover { border-color: #f4a92a; color: #f4a92a; background: rgba(244,169,42,0.12); transform: none !important; }
 
+.app-nav-signup {
+  background: linear-gradient(135deg, #f4a92a, #e0981a);
+  color: #1a2b4a; border: none; padding: 0.4rem 1rem;
+  border-radius: 8px; font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; transition: opacity 0.2s; margin: 0; transform: none !important;
+}
+.app-nav-signup:hover { opacity: 0.88; transform: none !important; }
+
 /* ── Page ── */
 .app-page { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
 

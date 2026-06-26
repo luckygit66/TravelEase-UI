@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
@@ -6,6 +6,19 @@ const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('te_token'));
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('te_user') || 'null'));
+  const [demoToken, setDemoToken] = useState(null);
+
+  // Signup is optional — anonymous visitors still need a valid token to call the
+  // API, so auto-fetch the same demo token the embeddable widget uses. Chat works
+  // immediately without an account; signing up is a choice, not a gate.
+  useEffect(() => {
+    if (!token && !demoToken) {
+      fetch(`${API}/Auth/demo-token`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(d => { if (d) setDemoToken(d.token); })
+        .catch(() => {});
+    }
+  }, [token, demoToken]);
 
   const login = async (email, password) => {
     const res = await fetch(`${API}/Auth/login`, {
@@ -50,7 +63,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, register, logout }}>
+    <AuthContext.Provider value={{ token: token || demoToken, realToken: token, isAnonymous: !token, user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

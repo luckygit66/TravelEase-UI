@@ -17,7 +17,18 @@
   width: 100%;
   max-width: 420px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  position: relative;
 }
+
+.gate-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  background: none; border: none;
+  font-size: 1rem; color: #aaa;
+  cursor: pointer; padding: 6px;
+  transform: none !important;
+}
+.gate-close:hover { color: #1a1a2e; transform: none !important; }
 
 .gate-logo { display: flex; justify-content: center; margin-bottom: 1.25rem; }
 

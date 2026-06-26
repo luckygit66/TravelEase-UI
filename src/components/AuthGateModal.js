@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import './AuthGateModal.css';
 import Logo from './Logo';
 
-function AuthGateModal({ onSuccess }) {
+function AuthGateModal({ onSuccess, onClose }) {
   const { login, register } = useAuth();
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
@@ -33,8 +33,9 @@ function AuthGateModal({ onSuccess }) {
   };
 
   return (
-    <div className="gate-overlay">
-      <div className="gate-card">
+    <div className="gate-overlay" onClick={onClose}>
+      <div className="gate-card" onClick={e => e.stopPropagation()}>
+        {onClose && <button type="button" className="gate-close" onClick={onClose} aria-label="Close">✕</button>}
         <div className="gate-logo"><Logo iconSize={30} /></div>
 
         <div className="gate-tabs">

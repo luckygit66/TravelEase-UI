@@ -86,8 +86,8 @@ function DestinationCard({ dest, from, onSearch }) {
   );
 }
 
-function MainApp({ onGoHome, initialQuery = '' }) {
-  const { token, user, logout } = useAuth();
+function MainApp({ onGoHome, initialQuery = '', onRequestSignup }) {
+  const { token, user, logout, isAnonymous } = useAuth();
   const firstName = user?.firstName || 'there';
 
   const [messages, setMessages] = useState([{
@@ -274,9 +274,13 @@ function MainApp({ onGoHome, initialQuery = '' }) {
         <span onClick={onGoHome} style={{ cursor: 'pointer' }}><Logo iconSize={30} /></span>
         <div className="app-nav-right">
           {user && <span className="app-nav-user">Hi, {user.firstName} 👋</span>}
-          <button className="app-nav-logout" onClick={() => { logout(); onGoHome(); }}>
-            <FiLogOut size={15} style={{ marginRight: 5 }} /> Sign Out
-          </button>
+          {isAnonymous ? (
+            <button className="app-nav-signup" onClick={onRequestSignup}>Sign Up</button>
+          ) : (
+            <button className="app-nav-logout" onClick={() => { logout(); onGoHome(); }}>
+              <FiLogOut size={15} style={{ marginRight: 5 }} /> Sign Out
+            </button>
+          )}
         </div>
       </nav>
 
@@ -356,47 +360,43 @@ function isTokenExpired(token) {
 }
 
 function AppRouter() {
-  const { token, logout } = useAuth();
+  const { realToken, logout } = useAuth();
   const [page, setPage] = useState(() => {
     if (window.location.pathname === '/agencies') return 'agency-signup';
-    if (!token) return 'landing';
-    if (isTokenExpired(token)) return 'login';
-    return 'app';
+    if (realToken && !isTokenExpired(realToken)) return 'app';
+    return 'landing';
   });
   const [initialQuery, setInitialQuery] = useState('');
+  const [showSignup, setShowSignup] = useState(false);
 
+  // Signup is optional — an expired real session just drops back to anonymous
+  // (AuthContext auto-fetches a demo token), no forced redirect to login.
   useEffect(() => {
-    if (!token && page === 'app') setPage('login');
-  }, [token, page]);
-
-  useEffect(() => {
-    if (token && isTokenExpired(token)) { logout(); setPage('login'); }
-  }, [token, logout]);
+    if (realToken && isTokenExpired(realToken)) logout();
+  }, [realToken, logout]);
 
   const goToApp = (query = '') => {
     setInitialQuery(query || '');
     setPage('app');
-  };
-
-  const handleGetStarted = (query) => {
-    if (token) goToApp(query);
-    else { setInitialQuery(query || ''); setPage('login'); }
+    setShowSignup(false);
   };
 
   if (page === 'login') return <LoginPage onSuccess={() => goToApp(initialQuery)} onGoRegister={() => setPage('register')} onGoHome={() => setPage('landing')} />;
   if (page === 'register') return <RegisterPage onSuccess={() => goToApp(initialQuery)} onGoLogin={() => setPage('login')} onGoHome={() => setPage('landing')} />;
   if (page === 'agency-signup') return <AgencySignupPage onGoHome={() => setPage('landing')} />;
-  if (page === 'app') return <MainApp onGoHome={() => setPage('landing')} initialQuery={initialQuery} />;
+  if (page === 'app') return (
+    <>
+      <MainApp onGoHome={() => setPage('landing')} initialQuery={initialQuery} onRequestSignup={() => setShowSignup(true)} />
+      {showSignup && <AuthGateModal onSuccess={() => setShowSignup(false)} onClose={() => setShowSignup(false)} />}
+    </>
+  );
 
   return (
-    <>
-      <LandingPage
-        onGetStarted={handleGetStarted}
-        onGoLogin={() => setPage('login')}
-        onGoRegister={() => setPage('register')}
-      />
-      {!token && <AuthGateModal onSuccess={() => goToApp(initialQuery)} />}
-    </>
+    <LandingPage
+      onGetStarted={(query) => goToApp(query)}
+      onGoLogin={() => setPage('login')}
+      onGoRegister={() => setPage('register')}
+    />
   );
 }
 
