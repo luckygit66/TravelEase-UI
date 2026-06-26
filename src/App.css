@@ -228,6 +228,16 @@ body {
 }
 .drc-btn:hover { opacity: 0.88; }
 
+.drc-btn-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.drc-btn-row .drc-btn { margin-top: 0; }
+.drc-share-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: #f0f2f7; color: #1a2b4a; border-radius: 8px;
+  transition: background 0.2s;
+}
+.drc-share-btn:hover { background: #25D366; color: #fff; }
+
 /* ── Chat Input Bar ── */
 .chat-input-bar {
   background: #fff; border-top: 1px solid #e8edf5;

@@ -56,6 +56,9 @@
       '.tp-wc-meta{font-size:11px;color:#999;margin-top:3px;}' +
       '.tp-wcard-r{text-align:right;flex-shrink:0;}' +
       '.tp-wbtn{display:inline-block;background:var(--tp-brand);color:#fff;text-decoration:none;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;margin-top:7px;white-space:nowrap;}' +
+      '.tp-wbtn-row{display:flex;align-items:center;gap:6px;margin-top:7px;}' +
+      '.tp-wbtn-row .tp-wbtn{margin-top:0;}' +
+      '.tp-wshare{display:flex;align-items:center;justify-content:center;width:26px;height:26px;flex-shrink:0;background:#f0f2f8;border-radius:8px;text-decoration:none;font-size:13px;}' +
       '.tp-wdeal{display:inline-block;background:#fff3e0;color:#e65100;font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;margin-top:4px;}' +
       '.tp-wvisa{display:inline-block;background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;margin-top:4px;margin-left:4px;}' +
       '.tp-wchips{display:flex;flex-wrap:wrap;gap:6px;padding:6px 14px 8px;flex-shrink:0;}' +
@@ -306,12 +309,17 @@
       : 'https://www.aviasales.com/search/' + from + '0101' + to + '1?marker=' + marker;
   }
 
+  function whatsAppShareUrl(text) {
+    return 'https://wa.me/?text=' + encodeURIComponent(text);
+  }
+
   function destCards(dests, from) {
     var m = document.getElementById('tp-wm');
     var wrap = document.createElement('div');
     wrap.className = 'tp-wmsg ai';
     dests.forEach(function (d) {
       var url = aviasalesUrl(from, d.code, d.date, null);
+      var shareText = '✈️ Check out flights to ' + d.city + ', ' + d.country + ' on ' + d.date + '!\n' + url;
       var stopLabel = d.stops === 0 ? 'Direct' : d.stops + ' stop';
       var badges = '';
       if (d.dealScore === 'amazing') badges += '<span class="tp-wdeal">🔥 Amazing deal</span>';
@@ -328,7 +336,10 @@
         '</div>' +
         '<div class="tp-wcard-r">' +
           '<div class="tp-wc-meta">' + esc(d.date) + '</div>' +
-          '<a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Check Live Price</a>' +
+          '<div class="tp-wbtn-row">' +
+            '<a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Check Live Price</a>' +
+            '<a href="' + whatsAppShareUrl(shareText) + '" target="_blank" rel="noopener" class="tp-wshare" title="Share on WhatsApp">📤</a>' +
+          '</div>' +
         '</div>';
       wrap.appendChild(card);
     });
@@ -341,6 +352,7 @@
     el.className = 'tp-wmsg ai';
     var meta = date ? esc(date) : '';
     if (returnDate) meta += ' → ' + esc(returnDate);
+    var shareText = '✈️ Check out flights ' + from + ' → ' + to + (date ? ' on ' + date : '') + '!\n' + url;
     el.innerHTML =
       '<div class="tp-wcard">' +
         '<div>' +
@@ -348,7 +360,12 @@
           '<div class="tp-wc-city">Live prices on Aviasales</div>' +
           (meta ? '<div class="tp-wc-meta">' + meta + '</div>' : '') +
         '</div>' +
-        '<div class="tp-wcard-r"><a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Check Live Price</a></div>' +
+        '<div class="tp-wcard-r">' +
+          '<div class="tp-wbtn-row">' +
+            '<a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Check Live Price</a>' +
+            '<a href="' + whatsAppShareUrl(shareText) + '" target="_blank" rel="noopener" class="tp-wshare" title="Share on WhatsApp">📤</a>' +
+          '</div>' +
+        '</div>' +
       '</div>';
     m.appendChild(el); scrollBot();
   }

@@ -7,7 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import AgencySignupPage from './pages/AgencySignupPage';
 import AuthGateModal from './components/AuthGateModal';
 import './App.css';
-import { FiLogOut, FiArrowRight, FiSend } from 'react-icons/fi';
+import { FiLogOut, FiArrowRight, FiSend, FiShare2 } from 'react-icons/fi';
 import { exploreDestinations, getPriceCalendar } from './services/flightService';
 import CalendarView from './components/CalendarView';
 
@@ -27,7 +27,13 @@ function buildRouteUrl(from, to, date, passengers = 1) {
   return `https://www.aviasales.com/search/${searchStr}?marker=${TRAVELPAYOUTS_MARKER}`;
 }
 
+function buildWhatsAppShareUrl(text) {
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+
 function RouteSearchCard({ from, to, date, pax }) {
+  const url = buildRouteUrl(from, to, date, pax);
+  const shareText = `✈️ Check out flights ${from} → ${to}${date ? ` on ${date}` : ''}!\n${url}`;
   return (
     <div className="dest-result-card" style={{ maxWidth: 360 }}>
       <div className="drc-left">
@@ -38,20 +44,22 @@ function RouteSearchCard({ from, to, date, pax }) {
       <div className="drc-right">
         {date && <div className="drc-date">{date}</div>}
         {pax > 1 && <div className="drc-date">{pax} passengers</div>}
-        <a
-          href={buildRouteUrl(from, to, date, pax)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="drc-btn"
-        >
-          Check Live Price <FiArrowRight size={12} />
-        </a>
+        <div className="drc-btn-row">
+          <a href={url} target="_blank" rel="noopener noreferrer" className="drc-btn">
+            Check Live Price <FiArrowRight size={12} />
+          </a>
+          <a href={buildWhatsAppShareUrl(shareText)} target="_blank" rel="noopener noreferrer" className="drc-share-btn" title="Share on WhatsApp">
+            <FiShare2 size={14} />
+          </a>
+        </div>
       </div>
     </div>
   );
 }
 
 function DestinationCard({ dest, from, onSearch }) {
+  const url = buildAviasalesUrl(from, dest);
+  const shareText = `✈️ Check out flights to ${dest.city}, ${dest.country} on ${dest.date}!\n${url}`;
   return (
     <div className="dest-result-card">
       <div className="drc-left">
@@ -65,14 +73,14 @@ function DestinationCard({ dest, from, onSearch }) {
       </div>
       <div className="drc-right">
         <div className="drc-date">{dest.date}</div>
-        <a
-          href={buildAviasalesUrl(from, dest)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="drc-btn"
-        >
-          Check Live Price <FiArrowRight size={12} />
-        </a>
+        <div className="drc-btn-row">
+          <a href={url} target="_blank" rel="noopener noreferrer" className="drc-btn">
+            Check Live Price <FiArrowRight size={12} />
+          </a>
+          <a href={buildWhatsAppShareUrl(shareText)} target="_blank" rel="noopener noreferrer" className="drc-share-btn" title="Share on WhatsApp">
+            <FiShare2 size={14} />
+          </a>
+        </div>
       </div>
     </div>
   );
