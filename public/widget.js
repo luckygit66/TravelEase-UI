@@ -199,7 +199,7 @@
       var p = await pr.json();
       var from = p.from, to = p.to;
       var intent = p.searchIntent || (to ? 'route' : 'explore');
-      var rawDate = p.date || new Date().toISOString();
+      var rawDate = p.date || todayLocal();
       var month = rawDate.slice(0, 7);
 
       // LLM sometimes swaps from/to on explore queries (e.g. "from Mumbai" → to=BOM, from=null).
@@ -231,7 +231,7 @@
         }
 
       } else if (intent === 'calendar' && from && to) {
-        if (!/^\d{4}-\d{2}$/.test(month)) month = new Date().toISOString().slice(0, 7);
+        if (!/^\d{4}-\d{2}$/.test(month)) month = todayLocal().slice(0, 7);
         var cr = await fetch(API + '/FlightAggregator/calendar?from=' + from + '&to=' + to + '&month=' + month + '&currency=' + config.currency, {
           headers: { Authorization: 'Bearer ' + token }
         });
@@ -264,6 +264,13 @@
   }
 
   function done() { busy = false; document.getElementById('tp-wsend').disabled = false; }
+
+  // new Date().toISOString() returns the UTC date, which is still "yesterday" for IST
+  // users between 12:00-5:30 AM local time (IST is UTC+5:30). Use local date parts instead.
+  function todayLocal() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
 
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');

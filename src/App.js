@@ -31,6 +31,13 @@ function buildWhatsAppShareUrl(text) {
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 
+// new Date().toISOString() returns the UTC date, which is still "yesterday" for IST
+// users between 12:00–5:30 AM local time (IST is UTC+5:30). Use local date parts instead.
+function todayLocal() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function RouteSearchCard({ from, to, date, pax }) {
   const url = buildRouteUrl(from, to, date, pax);
   const shareText = `✈️ Check out flights ${from} → ${to}${date ? ` on ${date}` : ''}!\n${url}`;
@@ -148,7 +155,7 @@ function MainApp({ onGoHome, initialQuery = '', onRequestSignup }) {
 
       const p = await parseRes.json();
       let from = p.from, to = p.to;
-      const date = p.date || new Date().toISOString().split('T')[0];
+      const date = p.date || todayLocal();
       const { tripType, passengers } = p;
       const pax = passengers || 1;
 
@@ -172,7 +179,7 @@ function MainApp({ onGoHome, initialQuery = '', onRequestSignup }) {
         }
         // Ensure YYYY-MM format — LLM sometimes returns non-standard date strings
         const rawMonth = date ? date.slice(0, 7) : null;
-        const month = /^\d{4}-\d{2}$/.test(rawMonth || '') ? rawMonth : new Date().toISOString().slice(0, 7);
+        const month = /^\d{4}-\d{2}$/.test(rawMonth || '') ? rawMonth : todayLocal().slice(0, 7);
         try {
           const days = await getPriceCalendar(from, to, month, token);
           if (days?.length > 0) {
