@@ -221,12 +221,18 @@ body {
 }
 .drc-city { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; }
 .drc-country { font-size: 0.78rem; color: #94a3b8; }
-.drc-meta { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+.drc-stops-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.drc-stop-badge {
+  font-size: 0.72rem; font-weight: 700; padding: 2px 9px; border-radius: 10px;
+  background: #fff1f2; color: #be123c;
+}
+.drc-stop-badge.direct { background: #ecfdf5; color: #15803d; }
+.drc-airline { font-size: 0.78rem; color: #64748b; font-weight: 600; }
 .drc-badge { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin-top: 4px; margin-right: 4px; }
 .drc-badge-deal { background: #fff3e0; color: #e65100; }
 .drc-badge-visa { background: #e8f5e9; color: #2e7d32; }
 .drc-right { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
-.drc-date { font-size: 0.75rem; color: #94a3b8; }
+.drc-date { font-size: 0.95rem; color: #1a2b4a; font-weight: 700; }
 .drc-btn {
   display: flex; align-items: center; gap: 5px;
   background: linear-gradient(135deg, #f4a92a, #e0981a);

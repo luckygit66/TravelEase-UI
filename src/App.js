@@ -66,7 +66,12 @@ function DestinationCard({ dest, from, onSearch }) {
         <div className="drc-code">{dest.code}</div>
         <div className="drc-city">{dest.city}</div>
         <div className="drc-country">{dest.country}</div>
-        <div className="drc-meta">{dest.stops === 0 ? 'Direct' : `${dest.stops} stop`} · {dest.airline}</div>
+        <div className="drc-stops-row">
+          <span className={`drc-stop-badge ${dest.stops === 0 ? 'direct' : ''}`}>
+            {dest.stops === 0 ? 'Direct' : `${dest.stops} stop`}
+          </span>
+          <span className="drc-airline">{dest.airline}</span>
+        </div>
         {dest.dealScore === 'amazing' && <div className="drc-badge drc-badge-deal">🔥 Amazing deal</div>}
         {dest.dealScore === 'good' && <div className="drc-badge drc-badge-deal">✅ Good deal</div>}
         {dest.isVisaFree && <div className="drc-badge drc-badge-visa">🟢 Visa Free</div>}
