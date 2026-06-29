@@ -15,15 +15,18 @@ const API = process.env.REACT_APP_API_URL || 'http://localhost:5055/api';
 
 const TRAVELPAYOUTS_MARKER = '437825';
 
-function buildAviasalesUrl(from, dest, passengers = 1) {
-  const [, month, day] = (dest.date || '').split('-');
-  const searchStr = day && month ? `${from}${day}${month}${dest.code}${passengers}` : `${from}0101${dest.code}1`;
-  return `https://www.aviasales.com/search/${searchStr}?marker=${TRAVELPAYOUTS_MARKER}`;
+function buildAviasalesUrl(from, dest, passengers = 1, returnDate = null) {
+  return buildRouteUrl(from, dest.code, dest.date, passengers, returnDate);
 }
 
-function buildRouteUrl(from, to, date, passengers = 1) {
+function buildRouteUrl(from, to, date, passengers = 1, returnDate = null) {
   const [, month, day] = (date || '').split('-');
-  const searchStr = day && month ? `${from}${day}${month}${to}${passengers}` : `${from}0101${to}1`;
+  if (!day || !month) return `https://www.aviasales.com/search/${from}0101${to}1?marker=${TRAVELPAYOUTS_MARKER}`;
+
+  const [, rMonth, rDay] = (returnDate || '').split('-');
+  const searchStr = rDay && rMonth
+    ? `${from}${day}${month}${to}${passengers}${rDay}${rMonth}`
+    : `${from}${day}${month}${to}${passengers}`;
   return `https://www.aviasales.com/search/${searchStr}?marker=${TRAVELPAYOUTS_MARKER}`;
 }
 
@@ -38,9 +41,9 @@ function todayLocal() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function RouteSearchCard({ from, to, date, pax }) {
-  const url = buildRouteUrl(from, to, date, pax);
-  const shareText = `✈️ Check out flights ${from} → ${to}${date ? ` on ${date}` : ''}!\n${url}`;
+function RouteSearchCard({ from, to, date, pax, returnDate }) {
+  const url = buildRouteUrl(from, to, date, pax, returnDate);
+  const shareText = `✈️ Check out flights ${from} → ${to}${date ? ` on ${date}` : ''}${returnDate ? ` (return ${returnDate})` : ''}!\n${url}`;
   return (
     <div className="dest-result-card" style={{ maxWidth: 360 }}>
       <div className="drc-left">
@@ -50,6 +53,7 @@ function RouteSearchCard({ from, to, date, pax }) {
       </div>
       <div className="drc-right">
         {date && <div className="drc-date">{date}</div>}
+        {returnDate && <div className="drc-date">Return: {returnDate}</div>}
         {pax > 1 && <div className="drc-date">{pax} passengers</div>}
         <div className="drc-btn-row">
           <a href={url} target="_blank" rel="noopener noreferrer" className="drc-btn">
@@ -64,9 +68,9 @@ function RouteSearchCard({ from, to, date, pax }) {
   );
 }
 
-function DestinationCard({ dest, from, onSearch }) {
-  const url = buildAviasalesUrl(from, dest);
-  const shareText = `✈️ Check out flights to ${dest.city}, ${dest.country} on ${dest.date}!\n${url}`;
+function DestinationCard({ dest, from, onSearch, returnDate }) {
+  const url = buildAviasalesUrl(from, dest, 1, returnDate);
+  const shareText = `✈️ Check out flights to ${dest.city}, ${dest.country} on ${dest.date}${returnDate ? ` (return ${returnDate})` : ''}!\n${url}`;
   return (
     <div className="dest-result-card">
       <div className="drc-left">
@@ -85,6 +89,7 @@ function DestinationCard({ dest, from, onSearch }) {
       </div>
       <div className="drc-right">
         <div className="drc-date">{dest.date}</div>
+        {returnDate && <div className="drc-date">Return: {returnDate}</div>}
         <div className="drc-btn-row">
           <a href={url} target="_blank" rel="noopener noreferrer" className="drc-btn">
             Check Live Price <FiArrowRight size={12} />
@@ -156,7 +161,7 @@ function MainApp({ onGoHome, initialQuery = '', onRequestSignup }) {
       const p = await parseRes.json();
       let from = p.from, to = p.to;
       const date = p.date || todayLocal();
-      const { tripType, passengers } = p;
+      const { tripType, passengers, returnDate } = p;
       const pax = passengers || 1;
 
       let intent = p.searchIntent || (to ? 'route' : 'explore');
@@ -249,20 +254,22 @@ function MainApp({ onGoHome, initialQuery = '', onRequestSignup }) {
               } catch { /* keep month-cheapest result if calendar lookup fails */ }
             }
 
-            const tripLabel = tripType === 'roundtrip' ? ' · Round trip' : '';
+            const isRoundtrip = tripType === 'roundtrip' && !!returnDate;
+            const tripLabel = isRoundtrip ? ` · Round trip (return ${returnDate})` : '';
             const paxInfo   = pax > 1 ? ` · ${pax} passengers` : '';
             pushMsg({
               role: 'ai',
               text: `Best options found · ${from} → ${to}${month ? ` · ${month}` : ''}${tripLabel}${paxInfo}${exactNote}`,
               destinations: shown,
               from,
+              returnDate: isRoundtrip ? returnDate : null,
             });
           } else {
             // TravelPayouts has no cached data for this route — send directly to Aviasales
             pushMsg({
               role: 'ai',
               text: `I don't have cached prices for ${from} → ${to} right now. Click below to search live prices on Aviasales:`,
-              routeCard: { from, to, date, pax },
+              routeCard: { from, to, date, pax, returnDate: tripType === 'roundtrip' ? returnDate : null },
             });
           }
         } catch (e) {
@@ -328,6 +335,7 @@ function MainApp({ onGoHome, initialQuery = '', onRequestSignup }) {
                             key={i}
                             dest={dest}
                             from={msg.from}
+                            returnDate={msg.returnDate}
                           />
                         ))}
                       </div>
