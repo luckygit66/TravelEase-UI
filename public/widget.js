@@ -225,7 +225,8 @@
         var dests = await er.json();
         if (Array.isArray(dests) && dests.length > 0) {
           aiMsg('Here are the best deals from ' + from + ':');
-          destCards(dests.slice(0, 4), from);
+          var exploreReturn = (p.tripType === 'roundtrip' && p.returnDate) ? p.returnDate : null;
+          destCards(dests.slice(0, 4), from, exploreReturn);
         } else {
           aiMsg('No deals found from ' + from + ' right now. Try a different month or budget.');
         }
@@ -320,13 +321,13 @@
     return 'https://wa.me/?text=' + encodeURIComponent(text);
   }
 
-  function destCards(dests, from) {
+  function destCards(dests, from, returnDate) {
     var m = document.getElementById('tp-wm');
     var wrap = document.createElement('div');
     wrap.className = 'tp-wmsg ai';
     dests.forEach(function (d) {
-      var url = aviasalesUrl(from, d.code, d.date, null);
-      var shareText = '✈️ Check out flights to ' + d.city + ', ' + d.country + ' on ' + d.date + '!\n' + url;
+      var url = aviasalesUrl(from, d.code, d.date, returnDate || null);
+      var shareText = '✈️ Check out flights to ' + d.city + ', ' + d.country + ' on ' + d.date + (returnDate ? ' (return ' + returnDate + ')' : '') + '!\n' + url;
       var stopLabel = d.stops === 0 ? 'Direct' : d.stops + ' stop';
       var badges = '';
       if (d.dealScore === 'amazing') badges += '<span class="tp-wdeal">🔥 Amazing deal</span>';
@@ -343,6 +344,7 @@
         '</div>' +
         '<div class="tp-wcard-r">' +
           '<div class="tp-wc-meta">' + esc(d.date) + '</div>' +
+          (returnDate ? '<div class="tp-wc-meta">Return: ' + esc(returnDate) + '</div>' : '') +
           '<div class="tp-wbtn-row">' +
             '<a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Check Live Price</a>' +
             '<a href="' + whatsAppShareUrl(shareText) + '" target="_blank" rel="noopener" class="tp-wshare" title="Share on WhatsApp">📤</a>' +

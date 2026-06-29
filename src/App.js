@@ -216,6 +216,7 @@ function MainApp({ onGoHome, initialQuery = '', onRequestSignup }) {
               text: `Here are the cheapest destinations from ${from}${monthInfo}${budgetInfo}${visaInfo}. Click any to check the live price:`,
               destinations,
               from,
+              returnDate: tripType === 'roundtrip' ? returnDate : null,
             });
           } else {
             pushMsg({ role: 'ai', text: `Couldn't find destinations from ${from}. Try a different month or budget.` });
