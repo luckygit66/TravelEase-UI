@@ -310,7 +310,9 @@
     var rparts = (returnDate || '').split('-');
     var marker = config.affiliateMarker || '437825';
     if (parts.length === 3 && rparts.length === 3) {
-      return 'https://www.aviasales.com/search/' + from + parts[2] + parts[1] + to + '1' + rparts[2] + rparts[1] + '?marker=' + marker;
+      // Aviasales segment grammar is {origin}{ddmm}{dest}{returnDdmm}{pax} -- the return
+      // date sits before the passenger count, not after.
+      return 'https://www.aviasales.com/search/' + from + parts[2] + parts[1] + to + rparts[2] + rparts[1] + '1' + '?marker=' + marker;
     }
     return parts.length === 3
       ? 'https://www.aviasales.com/search/' + from + parts[2] + parts[1] + to + '1?marker=' + marker

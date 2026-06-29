@@ -24,8 +24,10 @@ function buildRouteUrl(from, to, date, passengers = 1, returnDate = null) {
   if (!day || !month) return `https://www.aviasales.com/search/${from}0101${to}1?marker=${TRAVELPAYOUTS_MARKER}`;
 
   const [, rMonth, rDay] = (returnDate || '').split('-');
+  // Aviasales segment grammar is {origin}{ddmm}{dest}{returnDdmm}{pax} -- the return date
+  // sits before the passenger count, not after.
   const searchStr = rDay && rMonth
-    ? `${from}${day}${month}${to}${passengers}${rDay}${rMonth}`
+    ? `${from}${day}${month}${to}${rDay}${rMonth}${passengers}`
     : `${from}${day}${month}${to}${passengers}`;
   return `https://www.aviasales.com/search/${searchStr}?marker=${TRAVELPAYOUTS_MARKER}`;
 }
