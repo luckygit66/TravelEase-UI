@@ -328,8 +328,12 @@
     var wrap = document.createElement('div');
     wrap.className = 'tp-wmsg ai';
     dests.forEach(function (d) {
-      var url = aviasalesUrl(from, d.code, d.date, returnDate || null);
-      var shareText = '✈️ Check out flights to ' + d.city + ', ' + d.country + ' on ' + d.date + (returnDate ? ' (return ' + returnDate + ')' : '') + '!\n' + url;
+      // Each card has its own independently-cheapest departure date, but the return date is
+      // one fixed value shared across all of them — only use it where it's actually after
+      // departure, otherwise the round trip would return before it leaves.
+      var validReturn = (returnDate && d.date && returnDate > d.date) ? returnDate : null;
+      var url = aviasalesUrl(from, d.code, d.date, validReturn);
+      var shareText = '✈️ Check out flights to ' + d.city + ', ' + d.country + ' on ' + d.date + (validReturn ? ' (return ' + validReturn + ')' : '') + '!\n' + url;
       var stopLabel = d.stops === 0 ? 'Direct' : d.stops + ' stop';
       var badges = '';
       if (d.dealScore === 'amazing') badges += '<span class="tp-wdeal">🔥 Amazing deal</span>';
@@ -346,7 +350,7 @@
         '</div>' +
         '<div class="tp-wcard-r">' +
           '<div class="tp-wc-meta">' + esc(d.date) + '</div>' +
-          (returnDate ? '<div class="tp-wc-meta">Return: ' + esc(returnDate) + '</div>' : '') +
+          (validReturn ? '<div class="tp-wc-meta">Return: ' + esc(validReturn) + '</div>' : '') +
           '<div class="tp-wbtn-row">' +
             '<a href="' + url + '" target="_blank" rel="noopener" class="tp-wbtn">Check Live Price</a>' +
             '<a href="' + whatsAppShareUrl(shareText) + '" target="_blank" rel="noopener" class="tp-wshare" title="Share on WhatsApp">📤</a>' +

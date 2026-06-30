@@ -71,8 +71,12 @@ function RouteSearchCard({ from, to, date, pax, returnDate }) {
 }
 
 function DestinationCard({ dest, from, onSearch, returnDate }) {
-  const url = buildAviasalesUrl(from, dest, 1, returnDate);
-  const shareText = `✈️ Check out flights to ${dest.city}, ${dest.country} on ${dest.date}${returnDate ? ` (return ${returnDate})` : ''}!\n${url}`;
+  // Each card has its own independently-cheapest departure date, but the return date is one
+  // fixed value shared across all of them — only use it where it's actually after departure,
+  // otherwise the round trip would return before it leaves.
+  const validReturn = returnDate && dest.date && returnDate > dest.date ? returnDate : null;
+  const url = buildAviasalesUrl(from, dest, 1, validReturn);
+  const shareText = `✈️ Check out flights to ${dest.city}, ${dest.country} on ${dest.date}${validReturn ? ` (return ${validReturn})` : ''}!\n${url}`;
   return (
     <div className="dest-result-card">
       <div className="drc-left">
@@ -91,7 +95,7 @@ function DestinationCard({ dest, from, onSearch, returnDate }) {
       </div>
       <div className="drc-right">
         <div className="drc-date">{dest.date}</div>
-        {returnDate && <div className="drc-date">Return: {returnDate}</div>}
+        {validReturn && <div className="drc-date">Return: {validReturn}</div>}
         <div className="drc-btn-row">
           <a href={url} target="_blank" rel="noopener noreferrer" className="drc-btn">
             Check Live Price <FiArrowRight size={12} />
